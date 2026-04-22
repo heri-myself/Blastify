@@ -10,7 +10,7 @@ export function renderMessage(
   let result = resolveSpintax(template)
 
   for (const [key, value] of Object.entries(contactData)) {
-    result = result.replaceAll(`{${key}}`, value)
+    result = result.split(`{${key}}`).join(value)
   }
 
   result = result.replace(/\{[^|{}]+\}/g, '')
