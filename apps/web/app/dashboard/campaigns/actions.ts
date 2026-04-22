@@ -71,12 +71,16 @@ export async function createCampaign(formData: FormData) {
 
 export async function pauseCampaign(id: string) {
   const supabase = await createClient()
-  await supabase.from('campaigns').update({ status: 'paused' }).eq('id', id)
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return
+  await supabase.from('campaigns').update({ status: 'paused' }).eq('id', id).eq('user_id', user.id)
   revalidatePath(`/dashboard/campaigns/${id}`)
 }
 
 export async function resumeCampaign(id: string) {
   const supabase = await createClient()
-  await supabase.from('campaigns').update({ status: 'scheduled' }).eq('id', id)
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return
+  await supabase.from('campaigns').update({ status: 'scheduled' }).eq('id', id).eq('user_id', user.id)
   revalidatePath(`/dashboard/campaigns/${id}`)
 }

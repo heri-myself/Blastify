@@ -22,7 +22,9 @@ export async function addSender(formData: FormData) {
 
 export async function deleteSender(id: string) {
   const supabase = await createClient()
-  const { error } = await supabase.from('sender_phones').delete().eq('id', id)
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Unauthorized' }
+  const { error } = await supabase.from('sender_phones').delete().eq('id', id).eq('user_id', user.id)
   if (error) return { error: error.message }
   revalidatePath('/dashboard/senders')
   return { success: true }
