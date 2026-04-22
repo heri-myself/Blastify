@@ -1,0 +1,9 @@
+node_modules/
+.env
+.env.local
+.next/
+dist/
+.turbo/
+*.session.json
+auth_info_*/
+.DS_Store
