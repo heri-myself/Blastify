@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { Sidebar } from '@/components/sidebar'
 
 export default async function DashboardLayout({
   children,
@@ -12,6 +13,7 @@ export default async function DashboardLayout({
 
   return (
     <div className="flex min-h-screen bg-gray-50">
+      <Sidebar />
       <div className="flex-1 flex flex-col">
         <header className="bg-white border-b px-6 py-3 flex justify-end">
           <form action="/api/auth/signout" method="post">
