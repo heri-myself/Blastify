@@ -8,7 +8,9 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.47.0",
-    "@wa-broadcast/db": "workspace:*"
+    "@wa-broadcast/db": "workspace:*",
+    "@whiskeysockets/baileys": "^6.7.0",
+    "pino": "^9.0.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
