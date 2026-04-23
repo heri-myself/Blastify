@@ -23,7 +23,13 @@ export default async function CampaignsPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Campaign</h1>
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl font-bold text-gray-900">Campaign</h1>
+          <a href="/panduan-anti-banned.html" target="_blank"
+            className="text-xs text-blue-600 hover:underline font-medium">
+            📋 Panduan Anti-Banned
+          </a>
+        </div>
         <Link href="/dashboard/campaigns/new"
           className="inline-flex items-center justify-center rounded-lg border border-transparent bg-primary text-primary-foreground px-2.5 h-8 text-sm font-medium transition-all hover:opacity-90">
           + Buat Campaign
