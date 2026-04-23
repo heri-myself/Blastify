@@ -33,3 +33,28 @@ export async function deleteContact(id: string) {
   revalidatePath('/dashboard/contacts')
   return { success: true }
 }
+
+export async function addContact(data: { phone: string; name?: string; tags?: string }) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Unauthorized' }
+
+  const phone = data.phone.trim().replace(/\D/g, '')
+  if (!phone) return { error: 'Nomor HP tidak boleh kosong' }
+
+  const { error } = await supabase
+    .from('contacts')
+    .upsert(
+      [{
+        user_id: user.id,
+        phone,
+        name: data.name?.trim() || null,
+        tags: data.tags ? data.tags.split(',').map(t => t.trim()).filter(Boolean) : [],
+      }],
+      { onConflict: 'user_id,phone', ignoreDuplicates: false }
+    )
+
+  if (error) return { error: error.message }
+  revalidatePath('/dashboard/contacts')
+  return { success: true }
+}
