@@ -19,7 +19,7 @@ export default async function NewCampaignPage() {
   return (
     <div className="max-w-2xl">
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Buat Campaign Baru</h1>
-      <form action={createCampaign} className="space-y-5 bg-white rounded-lg border p-6">
+      <form action={createCampaign as (formData: FormData) => void} className="space-y-5 bg-white rounded-lg border p-6">
         <div className="space-y-2">
           <Label htmlFor="name">Nama Campaign</Label>
           <Input id="name" name="name" placeholder="Promo Ramadan 2026" required />
@@ -89,9 +89,10 @@ export default async function NewCampaignPage() {
 
         <div className="flex gap-3">
           <Button type="submit">Simpan Campaign</Button>
-          <Button type="button" variant="outline" asChild>
-            <a href="/dashboard/campaigns">Batal</a>
-          </Button>
+          <a href="/dashboard/campaigns"
+            className="inline-flex items-center justify-center rounded-lg border border-border bg-background h-8 px-2.5 text-sm font-medium hover:bg-muted transition-all">
+            Batal
+          </a>
         </div>
       </form>
     </div>

@@ -24,9 +24,10 @@ export default async function CampaignsPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Campaign</h1>
-        <Button asChild>
-          <Link href="/dashboard/campaigns/new">+ Buat Campaign</Link>
-        </Button>
+        <Link href="/dashboard/campaigns/new"
+          className="inline-flex items-center justify-center rounded-lg border border-transparent bg-primary text-primary-foreground px-2.5 h-8 text-sm font-medium transition-all hover:opacity-90">
+          + Buat Campaign
+        </Link>
       </div>
       <div className="bg-white rounded-lg border overflow-hidden">
         <table className="w-full text-sm">
@@ -53,9 +54,10 @@ export default async function CampaignsPage() {
                     : '-'}
                 </td>
                 <td className="px-4 py-3 text-right">
-                  <Button variant="ghost" size="sm" asChild>
-                    <Link href={`/dashboard/campaigns/${campaign.id}`}>Detail</Link>
-                  </Button>
+                  <Link href={`/dashboard/campaigns/${campaign.id}`}
+                    className="inline-flex items-center justify-center rounded-lg h-7 px-2.5 text-[0.8rem] font-medium hover:bg-muted hover:text-foreground transition-all">
+                    Detail
+                  </Link>
                 </td>
               </tr>
             ))}

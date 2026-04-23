@@ -54,11 +54,10 @@ export function UploadForm() {
         onChange={handleFile}
         disabled={loading}
       />
-      <Button asChild disabled={loading}>
-        <label htmlFor="media-upload" className="cursor-pointer">
-          {loading ? 'Mengupload...' : 'Upload Media'}
-        </label>
-      </Button>
+      <label htmlFor="media-upload"
+        className={`inline-flex items-center justify-center rounded-lg border border-transparent bg-primary text-primary-foreground h-8 px-2.5 text-sm font-medium transition-all cursor-pointer hover:opacity-90 ${loading ? 'opacity-50 pointer-events-none' : ''}`}>
+        {loading ? 'Mengupload...' : 'Upload Media'}
+      </label>
       {status && <span className="text-sm text-gray-500">{status}</span>}
     </div>
   )

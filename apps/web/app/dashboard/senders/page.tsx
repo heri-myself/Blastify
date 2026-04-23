@@ -37,7 +37,7 @@ export default async function SendersPage() {
 
       <div className="bg-white rounded-lg border p-4 mb-6">
         <h2 className="font-medium mb-3">Tambah Nomor Sender</h2>
-        <form action={addSender} className="flex gap-3">
+        <form action={addSender as (formData: FormData) => void} className="flex gap-3">
           <Input name="phone_number" placeholder="628xxxxxxxxxx" required className="max-w-xs" />
           <Input name="display_name" placeholder="Nama (opsional)" className="max-w-xs" />
           <Button type="submit">Tambah</Button>

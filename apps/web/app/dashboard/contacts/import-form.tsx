@@ -45,11 +45,10 @@ export function ImportForm() {
         onChange={handleFile}
         disabled={loading}
       />
-      <Button asChild variant="outline" disabled={loading}>
-        <label htmlFor="csv-upload" className="cursor-pointer">
-          {loading ? 'Mengimpor...' : 'Import CSV'}
-        </label>
-      </Button>
+      <label htmlFor="csv-upload"
+        className={`inline-flex items-center justify-center rounded-lg border border-border bg-background h-8 px-2.5 text-sm font-medium transition-all cursor-pointer hover:bg-muted ${loading ? 'opacity-50 pointer-events-none' : ''}`}>
+        {loading ? 'Mengimpor...' : 'Import CSV'}
+      </label>
       {status && <span className="text-sm text-gray-500">{status}</span>}
     </div>
   )
