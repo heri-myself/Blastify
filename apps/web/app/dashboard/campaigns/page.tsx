@@ -23,16 +23,7 @@ export default async function CampaignsPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-bold text-gray-900">Campaign</h1>
-          <a href="/panduan-anti-banned.html" target="_blank"
-            className="inline-flex items-center gap-1 bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors text-xs font-medium px-2.5 py-1 rounded-full">
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
-              <path fillRule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm8.706-1.442c1.146-.573 2.437.463 2.126 1.706l-.709 2.836.042-.02a.75.75 0 01.67 1.34l-.04.022c-1.147.573-2.438-.463-2.127-1.706l.71-2.836-.042.02a.75.75 0 11-.671-1.34l.041-.022zM12 9a.75.75 0 100-1.5.75.75 0 000 1.5z" clipRule="evenodd" />
-            </svg>
-            Panduan Anti-Banned
-          </a>
-        </div>
+        <h1 className="text-2xl font-bold text-gray-900">Campaign</h1>
         <Link href="/dashboard/campaigns/new"
           className="inline-flex items-center justify-center rounded-lg border border-transparent bg-primary text-primary-foreground px-2.5 h-8 text-sm font-medium transition-all hover:opacity-90">
           + Buat Campaign
