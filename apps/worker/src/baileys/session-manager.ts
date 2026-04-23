@@ -33,10 +33,20 @@ export async function initSession(senderId: string): Promise<void> {
 
   const sock = await createWAConnection(
     senderId,
-    (qr) => console.log(`[session-manager] QR untuk ${senderId}: ${qr.substring(0, 30)}...`),
-    () => {
+    async (qr) => {
+      console.log(`[session-manager] QR untuk ${senderId}: ${qr.substring(0, 30)}...`)
+      await supabase
+        .from('sender_phones')
+        .update({ session_data: { qr, connected: false } })
+        .eq('id', senderId)
+    },
+    async () => {
       const session = sessions.get(senderId)
       if (session) session.ready = true
+      await supabase
+        .from('sender_phones')
+        .update({ session_data: { qr: null, connected: true }, status: 'active' })
+        .eq('id', senderId)
     },
     (shouldReconnect) => {
       sessions.delete(senderId)
