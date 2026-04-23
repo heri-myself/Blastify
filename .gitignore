@@ -7,3 +7,5 @@ dist/
 *.session.json
 auth_info_*/
 .DS_Store
+.vercel
+.env*.local
