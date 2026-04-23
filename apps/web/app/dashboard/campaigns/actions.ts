@@ -84,3 +84,31 @@ export async function resumeCampaign(id: string) {
   await supabase.from('campaigns').update({ status: 'scheduled' }).eq('id', id).eq('user_id', user.id)
   revalidatePath(`/dashboard/campaigns/${id}`)
 }
+
+export async function updateCampaignMessage(formData: FormData) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Unauthorized' }
+
+  const messageId = formData.get('message_id') as string
+  const content = formData.get('content') as string
+  const campaignId = formData.get('campaign_id') as string
+
+  const { error } = await supabase
+    .from('campaign_messages')
+    .update({ content })
+    .eq('id', messageId)
+
+  if (error) return { error: error.message }
+  revalidatePath(`/dashboard/campaigns/${campaignId}`)
+  return { success: true }
+}
+
+export async function deleteCampaign(id: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return
+  await supabase.from('campaigns').delete().eq('id', id).eq('user_id', user.id)
+  revalidatePath('/dashboard/campaigns')
+  redirect('/dashboard/campaigns')
+}

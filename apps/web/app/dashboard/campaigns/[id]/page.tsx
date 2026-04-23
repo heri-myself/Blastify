@@ -1,7 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
-import { pauseCampaign, resumeCampaign } from '../actions'
+import { pauseCampaign, resumeCampaign, deleteCampaign } from '../actions'
 import { Button } from '@/components/ui/button'
 import { notFound } from 'next/navigation'
+import { EditMessageForm } from './edit-message-form'
 
 export default async function CampaignDetailPage({
   params,
@@ -54,6 +55,13 @@ export default async function CampaignDetailPage({
               <Button type="submit">Lanjutkan</Button>
             </form>
           )}
+          <form action={async () => { 'use server'; await deleteCampaign(id) }}
+            onSubmit={(e) => { if (!confirm('Hapus campaign ini?')) e.preventDefault() }}>
+            <Button variant="ghost" type="submit"
+              className="text-red-500 hover:text-red-700 hover:bg-red-50">
+              Hapus Campaign
+            </Button>
+          </form>
         </div>
       </div>
 
@@ -75,10 +83,11 @@ export default async function CampaignDetailPage({
 
       {campaign.campaign_messages?.[0] && (
         <div className="bg-white rounded-lg border p-4">
-          <h2 className="font-medium mb-2">Isi Pesan</h2>
-          <p className="text-sm text-gray-600 whitespace-pre-wrap">
-            {campaign.campaign_messages[0].content}
-          </p>
+          <EditMessageForm
+            messageId={campaign.campaign_messages[0].id}
+            campaignId={id}
+            initialContent={campaign.campaign_messages[0].content ?? ''}
+          />
         </div>
       )}
     </div>
