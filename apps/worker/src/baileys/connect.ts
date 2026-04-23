@@ -8,7 +8,7 @@ import {
 import { Boom } from '@hapi/boom'
 import { join } from 'path'
 import { supabase } from '../supabase'
-import * as pino from 'pino'
+import pino from 'pino'
 
 const logger = pino({ level: 'warn' })
 
