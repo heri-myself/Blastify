@@ -36,7 +36,9 @@ export function AddContactForm() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger>
-        <Button size="sm" type="button">+ Tambah Kontak</Button>
+        <span className="inline-flex items-center justify-center rounded-lg border border-border bg-background h-8 px-2.5 text-sm font-medium transition-all cursor-pointer hover:bg-muted">
+          + Tambah Kontak
+        </span>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
