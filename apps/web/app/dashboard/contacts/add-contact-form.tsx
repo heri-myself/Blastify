@@ -36,7 +36,7 @@ export function AddContactForm() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger>
-        <span className="inline-flex items-center justify-center rounded-lg border border-border bg-background h-8 px-2.5 text-sm font-medium transition-all cursor-pointer hover:bg-muted">
+        <span className="inline-flex items-center justify-center rounded-lg border border-black bg-black text-white h-8 px-2.5 text-sm font-medium transition-all cursor-pointer hover:bg-gray-800">
           + Tambah Kontak
         </span>
       </DialogTrigger>
