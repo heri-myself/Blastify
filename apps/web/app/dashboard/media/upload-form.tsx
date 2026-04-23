@@ -22,6 +22,12 @@ export function UploadForm() {
 
     const ext = file.name.split('.').pop()
     const path = `${user.id}/${Date.now()}.${ext}`
+    if (file.size > 1 * 1024 * 1024) {
+      setStatus('Error: ukuran file maksimal 1MB')
+      setLoading(false)
+      return
+    }
+
     const { error: uploadError } = await supabase.storage.from('media').upload(path, file)
     if (uploadError) { setStatus(`Error: ${uploadError.message}`); setLoading(false); return }
 
