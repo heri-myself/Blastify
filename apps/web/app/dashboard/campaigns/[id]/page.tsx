@@ -1,8 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
-import { pauseCampaign, resumeCampaign, deleteCampaign } from '../actions'
+import { pauseCampaign, resumeCampaign } from '../actions'
 import { Button } from '@/components/ui/button'
 import { notFound } from 'next/navigation'
 import { EditMessageForm } from './edit-message-form'
+import { DeleteCampaignButton } from './delete-campaign-button'
 
 export default async function CampaignDetailPage({
   params,
@@ -55,13 +56,7 @@ export default async function CampaignDetailPage({
               <Button type="submit">Lanjutkan</Button>
             </form>
           )}
-          <form action={async () => { 'use server'; await deleteCampaign(id) }}
-            onSubmit={(e) => { if (!confirm('Hapus campaign ini?')) e.preventDefault() }}>
-            <Button variant="ghost" type="submit"
-              className="text-red-500 hover:text-red-700 hover:bg-red-50">
-              Hapus Campaign
-            </Button>
-          </form>
+          <DeleteCampaignButton campaignId={id} />
         </div>
       </div>
 
