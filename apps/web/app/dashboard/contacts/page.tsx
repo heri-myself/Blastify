@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { ImportForm } from './import-form'
+import { AddContactForm } from './add-contact-form'
 import { deleteContact } from './actions'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -18,7 +19,10 @@ export default async function ContactsPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Kontak</h1>
-        <ImportForm />
+        <div className="flex items-center gap-2">
+          <AddContactForm />
+          <ImportForm />
+        </div>
       </div>
       <p className="text-sm text-gray-500 mb-2">
         Format CSV: kolom <code className="bg-gray-100 px-1 rounded">phone</code>,{' '}
