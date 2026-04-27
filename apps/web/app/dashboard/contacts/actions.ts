@@ -8,7 +8,6 @@ export async function importContacts(contacts: Array<{ phone: string; name?: str
   const profile = await getUserRole()
   if (!profile) return { error: 'Unauthorized' }
 
-  const admin = createAdminClient()
   const rows = contacts
     .filter(c => c.phone?.trim())
     .map(c => ({
@@ -18,6 +17,9 @@ export async function importContacts(contacts: Array<{ phone: string; name?: str
       tags: c.tags ? c.tags.split(',').map(t => t.trim()).filter(Boolean) : [],
     }))
 
+  if (rows.length === 0) return { error: 'Tidak ada data valid', count: 0 }
+
+  const admin = createAdminClient()
   const { error } = await admin
     .from('contacts')
     .upsert(rows, { onConflict: 'user_id,phone', ignoreDuplicates: false })
@@ -53,12 +55,8 @@ export async function addContact(data: { phone: string; name?: string; tags?: st
   const { error } = await admin
     .from('contacts')
     .upsert(
-      [{
-        user_id: profile.userId,
-        phone,
-        name: data.name?.trim() || null,
-        tags: data.tags ? data.tags.split(',').map(t => t.trim()).filter(Boolean) : [],
-      }],
+      [{ user_id: profile.userId, phone, name: data.name?.trim() || null,
+         tags: data.tags ? data.tags.split(',').map(t => t.trim()).filter(Boolean) : [] }],
       { onConflict: 'user_id,phone', ignoreDuplicates: false }
     )
 
