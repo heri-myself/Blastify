@@ -58,7 +58,7 @@ export default async function NewCampaignPage() {
             name="content"
             required
             placeholder="Halo {nama}! {Promo ini|Penawaran spesial ini} untuk Anda 🎉"
-            rows={4}
+            rows={8}
           />
         </div>
 
