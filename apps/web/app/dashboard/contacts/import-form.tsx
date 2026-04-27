@@ -20,10 +20,24 @@ export function ImportForm() {
     Papa.parse(file, {
       header: true,
       skipEmptyLines: true,
+      dynamicTyping: false,
       complete: async (results) => {
-        const rows = results.data as Array<{ phone: string; name?: string; tags?: string }>
+        // Normalize column names to lowercase so CSV headers like "Phone", "PHONE", "Nomor" etc. work
+        const rawRows = results.data as Array<Record<string, string>>
+        const rows = rawRows.map(row => {
+          const normalized: Record<string, string> = {}
+          for (const key of Object.keys(row)) {
+            normalized[key.toLowerCase().trim()] = row[key]
+          }
+          // Also map common Indonesian/alternative column names to standard keys
+          return {
+            phone: String(normalized['phone'] || normalized['nomor'] || normalized['no_hp'] || normalized['no hp'] || normalized['handphone'] || normalized['whatsapp'] || normalized['wa'] || ''),
+            name: normalized['name'] || normalized['nama'] || undefined,
+            tags: normalized['tags'] || normalized['tag'] || normalized['label'] || undefined,
+          }
+        }).filter(r => r.phone?.trim())
         if (rows.length === 0) {
-          setStatus('File CSV kosong atau format tidak sesuai')
+          setStatus('File CSV kosong atau format tidak sesuai. Pastikan ada kolom "phone" / "nomor" / "no_hp"')
           setIsError(true)
           setLoading(false)
           return

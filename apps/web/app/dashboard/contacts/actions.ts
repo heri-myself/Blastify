@@ -8,6 +8,7 @@ export async function importContacts(contacts: Array<{ phone: string; name?: str
   const profile = await getUserRole()
   if (!profile) return { error: 'Unauthorized' }
 
+  console.log('[importContacts] received contacts sample:', JSON.stringify(contacts.slice(0, 3)))
   const rows = contacts
     .filter(c => c.phone?.trim())
     .map(c => ({
