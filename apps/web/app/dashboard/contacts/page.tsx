@@ -2,8 +2,6 @@ import { createClient } from '@/lib/supabase/server'
 import { ImportForm } from './import-form'
 import { AddContactForm } from './add-contact-form'
 import { deleteContact } from './actions'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 
 export default async function ContactsPage() {
   const supabase = await createClient()
@@ -18,62 +16,66 @@ export default async function ContactsPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Kontak</h1>
+        <div>
+          <h1 className="text-xl font-semibold text-[#111111]">Kontak</h1>
+          <p className="text-[13px] text-[#7a7a7a] mt-0.5">
+            Format CSV: kolom <code className="bg-[#f2f2f0] px-1 py-0.5 rounded text-[12px]">phone</code>,{' '}
+            <code className="bg-[#f2f2f0] px-1 py-0.5 rounded text-[12px]">name</code>,{' '}
+            <code className="bg-[#f2f2f0] px-1 py-0.5 rounded text-[12px]">tags</code>
+          </p>
+        </div>
         <div className="flex items-center gap-2">
           <AddContactForm />
           <ImportForm />
         </div>
       </div>
-      <p className="text-sm text-gray-500 mb-2">
-        Format CSV: kolom <code className="bg-gray-100 px-1 rounded">phone</code>,{' '}
-        <code className="bg-gray-100 px-1 rounded">name</code> (opsional),{' '}
-        <code className="bg-gray-100 px-1 rounded">tags</code> (opsional, pisah koma)
-      </p>
-      <div className="bg-white rounded-lg border overflow-hidden">
+
+      <div className="bg-white rounded-xl border border-[#e8e8e6] overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 border-b">
-            <tr>
-              <th className="text-left px-4 py-3 font-medium text-gray-500">Nomor</th>
-              <th className="text-left px-4 py-3 font-medium text-gray-500">Nama</th>
-              <th className="text-left px-4 py-3 font-medium text-gray-500">Tags</th>
-              <th className="text-left px-4 py-3 font-medium text-gray-500">Status</th>
-              <th className="px-4 py-3"></th>
+          <thead>
+            <tr className="border-b border-[#e8e8e6]">
+              <th className="text-left px-4 py-3 text-[12px] font-medium text-[#7a7a7a] uppercase tracking-wider">Nomor</th>
+              <th className="text-left px-4 py-3 text-[12px] font-medium text-[#7a7a7a] uppercase tracking-wider">Nama</th>
+              <th className="text-left px-4 py-3 text-[12px] font-medium text-[#7a7a7a] uppercase tracking-wider">Tags</th>
+              <th className="text-left px-4 py-3 text-[12px] font-medium text-[#7a7a7a] uppercase tracking-wider">Status</th>
+              <th className="px-4 py-3" />
             </tr>
           </thead>
-          <tbody className="divide-y">
+          <tbody className="divide-y divide-[#f2f2f0]">
             {contacts?.map((contact) => (
-              <tr key={contact.id} className="hover:bg-gray-50">
-                <td className="px-4 py-3 font-mono">{contact.phone}</td>
-                <td className="px-4 py-3">{contact.name ?? '-'}</td>
+              <tr key={contact.id} className="hover:bg-[#f8f8f7] transition-colors">
+                <td className="px-4 py-3 font-mono text-[13px] text-[#111111]">{contact.phone}</td>
+                <td className="px-4 py-3 text-[13px] text-[#111111]">{contact.name ?? '—'}</td>
                 <td className="px-4 py-3">
                   <div className="flex gap-1 flex-wrap">
                     {contact.tags?.map((tag: string) => (
-                      <Badge key={tag} variant="secondary">{tag}</Badge>
+                      <span key={tag} className="text-[11px] px-2 py-0.5 rounded-full bg-[#f2f2f0] text-[#7a7a7a] font-medium">
+                        {tag}
+                      </span>
                     ))}
                   </div>
                 </td>
                 <td className="px-4 py-3">
                   {contact.is_blocked ? (
-                    <Badge variant="destructive">Blocked</Badge>
+                    <span className="text-[12px] px-2.5 py-1 rounded-full bg-red-50 text-red-500 font-medium">Blocked</span>
                   ) : contact.opt_out_at ? (
-                    <Badge variant="outline">Opt-out</Badge>
+                    <span className="text-[12px] px-2.5 py-1 rounded-full bg-[#f2f2f0] text-[#7a7a7a] font-medium">Opt-out</span>
                   ) : (
-                    <Badge className="bg-green-100 text-green-700">Aktif</Badge>
+                    <span className="text-[12px] px-2.5 py-1 rounded-full bg-[#f0fdf4] text-[#25D366] font-medium">Aktif</span>
                   )}
                 </td>
                 <td className="px-4 py-3 text-right">
                   <form action={async () => { 'use server'; await deleteContact(contact.id) }}>
-                    <Button variant="ghost" size="sm" type="submit"
-                      className="text-red-500 hover:text-red-700">
+                    <button type="submit" className="text-[13px] text-[#a0a0a0] hover:text-red-500 transition-colors font-medium">
                       Hapus
-                    </Button>
+                    </button>
                   </form>
                 </td>
               </tr>
             ))}
             {!contacts?.length && (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-gray-400">
+                <td colSpan={5} className="px-4 py-12 text-center text-[#a0a0a0] text-[13px]">
                   Belum ada kontak. Import CSV untuk memulai.
                 </td>
               </tr>
