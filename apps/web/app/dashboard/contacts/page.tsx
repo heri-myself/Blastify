@@ -43,7 +43,7 @@ export default async function ContactsPage({ searchParams }: Props) {
       .from('campaign_contacts')
       .select('contact_id, status, campaigns(name)')
       .in('contact_id', contactIds)
-      .order('created_at', { ascending: false })
+      .order('id', { ascending: false })
 
     if (broadcastData) {
       for (const row of broadcastData as any[]) {

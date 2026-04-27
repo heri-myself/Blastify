@@ -23,7 +23,7 @@ export default async function CampaignDetailPage({
       .from('campaign_contacts')
       .select('id, contact_id, status, sent_at, error_code, contacts(name, phone)')
       .eq('campaign_id', id)
-      .order('created_at', { ascending: true }),
+      .order('id', { ascending: true }),
     admin
       .from('contacts')
       .select('id, phone, name, tags, is_blocked, opt_out_at')
