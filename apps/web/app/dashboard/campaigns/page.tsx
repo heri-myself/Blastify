@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getUserRole } from '@/lib/get-user-role'
+import { deleteCampaign } from './actions'
 
 const statusStyle: Record<string, string> = {
   draft:      'bg-[#f2f2f0] text-[#7a7a7a]',
@@ -82,9 +83,16 @@ export default async function CampaignsPage() {
                   {campaign.scheduled_at ? new Date(campaign.scheduled_at).toLocaleString('id-ID') : '—'}
                 </td>
                 <td className="px-4 py-3 text-right">
-                  <Link href={`/dashboard/campaigns/${campaign.id}`} className="text-[13px] font-medium text-[#111111] hover:text-[#25D366] transition-colors">
-                    Detail →
-                  </Link>
+                  <div className="flex items-center justify-end gap-3">
+                    <Link href={`/dashboard/campaigns/${campaign.id}`} className="text-[13px] font-medium text-[#111111] hover:text-[#25D366] transition-colors">
+                      Detail →
+                    </Link>
+                    <form action={async () => { 'use server'; await deleteCampaign(campaign.id) }}>
+                      <button type="submit" className="text-[13px] text-[#a0a0a0] hover:text-red-500 transition-colors font-medium">
+                        Hapus
+                      </button>
+                    </form>
+                  </div>
                 </td>
               </tr>
             ))}
