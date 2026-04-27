@@ -6,11 +6,11 @@ import { ContactFilters } from './contact-filters'
 import { deleteContact } from './actions'
 
 interface Props {
-  searchParams: Promise<{ q?: string; status?: string; user?: string }>
+  searchParams: Promise<{ q?: string; status?: string; user?: string; tag?: string }>
 }
 
 export default async function ContactsPage({ searchParams }: Props) {
-  const { q, status, user } = await searchParams
+  const { q, status, user, tag } = await searchParams
   const profile = await getUserRole()
   const admin = createAdminClient()
   const isSuperadmin = profile?.role === 'superadmin'
@@ -27,11 +27,16 @@ export default async function ContactsPage({ searchParams }: Props) {
   else if (status === 'optout') query = query.not('opt_out_at', 'is', null)
   else if (status === 'aktif') query = query.eq('is_blocked', false).is('opt_out_at', null)
 
-  if (q) {
-    query = query.or(`phone.ilike.%${q}%,name.ilike.%${q}%`)
-  }
+  if (q) query = query.or(`phone.ilike.%${q}%,name.ilike.%${q}%`)
+  if (tag) query = query.contains('tags', [tag])
 
-  const { data: contacts } = await query
+  let tagsQuery = admin.from('contacts').select('tags')
+  if (!isSuperadmin) tagsQuery = tagsQuery.eq('user_id', profile!.userId)
+  else if (user) tagsQuery = tagsQuery.eq('user_id', user)
+
+  const [{ data: contacts }, { data: tagsData }] = await Promise.all([query, tagsQuery])
+
+  const allTags = Array.from(new Set((tagsData ?? []).flatMap(c => c.tags ?? []))).sort()
 
   let users: Array<{ id: string; email: string }> = []
   if (isSuperadmin) {
@@ -57,7 +62,7 @@ export default async function ContactsPage({ searchParams }: Props) {
         </div>
       </div>
 
-      <ContactFilters isSuperadmin={isSuperadmin} users={users} />
+      <ContactFilters isSuperadmin={isSuperadmin} users={users} allTags={allTags} />
 
       <div className="bg-white rounded-xl border border-[#e8e8e6] overflow-hidden">
         <table className="w-full text-sm">
@@ -113,7 +118,7 @@ export default async function ContactsPage({ searchParams }: Props) {
             {!contacts?.length && (
               <tr>
                 <td colSpan={isSuperadmin ? 6 : 5} className="px-4 py-12 text-center text-[#a0a0a0] text-[13px]">
-                  {q || status || user ? 'Tidak ada kontak yang cocok dengan filter.' : 'Belum ada kontak. Import CSV untuk memulai.'}
+                  {q || status || user || tag ? 'Tidak ada kontak yang cocok dengan filter.' : 'Belum ada kontak. Import CSV untuk memulai.'}
                 </td>
               </tr>
             )}

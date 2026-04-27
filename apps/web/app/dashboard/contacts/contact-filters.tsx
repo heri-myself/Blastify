@@ -6,9 +6,10 @@ import { useCallback } from 'react'
 interface ContactFiltersProps {
   users?: Array<{ id: string; email: string }>
   isSuperadmin: boolean
+  allTags?: string[]
 }
 
-export function ContactFilters({ users, isSuperadmin }: ContactFiltersProps) {
+export function ContactFilters({ users, isSuperadmin, allTags }: ContactFiltersProps) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -47,6 +48,19 @@ export function ContactFilters({ users, isSuperadmin }: ContactFiltersProps) {
         <option value="blocked">Blocked</option>
       </select>
 
+      {allTags && allTags.length > 0 && (
+        <select
+          defaultValue={searchParams.get('tag') ?? ''}
+          onChange={e => setParam('tag', e.target.value)}
+          className="h-9 px-3 rounded-lg border border-[#e8e8e6] bg-white text-[13px] text-[#111111] focus:outline-none focus:ring-1 focus:ring-[#111111] max-w-[180px]"
+        >
+          <option value="">Semua Tags</option>
+          {allTags.map(t => (
+            <option key={t} value={t}>{t}</option>
+          ))}
+        </select>
+      )}
+
       {isSuperadmin && users && users.length > 0 && (
         <select
           defaultValue={searchParams.get('user') ?? ''}
@@ -60,7 +74,7 @@ export function ContactFilters({ users, isSuperadmin }: ContactFiltersProps) {
         </select>
       )}
 
-      {(searchParams.get('q') || searchParams.get('status') || searchParams.get('user')) && (
+      {(searchParams.get('q') || searchParams.get('status') || searchParams.get('user') || searchParams.get('tag')) && (
         <button
           onClick={() => router.push(pathname)}
           className="h-9 px-3 rounded-lg border border-[#e8e8e6] bg-white text-[13px] text-[#7a7a7a] hover:text-[#111111] transition-colors"
