@@ -31,10 +31,27 @@ export default async function NewCampaignPage() {
           <Label>Sender WA</Label>
           <div className="space-y-2">
             {senders?.map(s => (
-              <label key={s.id} className="flex items-center gap-2 text-sm">
+              <label key={s.id} className="flex items-center gap-2 text-sm cursor-pointer">
                 <input type="checkbox" name="sender_ids" value={s.id} />
-                {s.display_name ?? s.phone_number}
-                <span className="text-xs text-gray-400">({s.status})</span>
+                <span>{s.display_name ?? s.phone_number}</span>
+                {s.status === 'active' ? (
+                  <span className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full font-medium bg-[#25D366] text-white">
+                    <span className="relative flex h-1.5 w-1.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
+                      <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white" />
+                    </span>
+                    Aktif
+                  </span>
+                ) : (
+                  <span className={{
+                    warmup:      'text-[11px] px-2 py-0.5 rounded-full font-medium bg-amber-50 text-amber-600',
+                    soft_banned: 'text-[11px] px-2 py-0.5 rounded-full font-medium bg-red-50 text-red-500',
+                    recovering:  'text-[11px] px-2 py-0.5 rounded-full font-medium bg-orange-50 text-orange-500',
+                    disabled:    'text-[11px] px-2 py-0.5 rounded-full font-medium bg-[#f2f2f0] text-[#7a7a7a]',
+                  }[s.status] ?? 'text-[11px] px-2 py-0.5 rounded-full font-medium bg-[#f2f2f0] text-[#7a7a7a]'}>
+                    {{ warmup: 'Warm-up', soft_banned: 'Soft Banned', recovering: 'Pemulihan', disabled: 'Nonaktif' }[s.status] ?? s.status}
+                  </span>
+                )}
               </label>
             ))}
             {!senders?.length && (
