@@ -7,7 +7,6 @@ export default function LoginPage() {
       title="Masuk"
       action={login}
       submitLabel="Masuk"
-      footerLink={{ href: '/register', label: 'Belum punya akun? Daftar' }}
     />
   )
 }
