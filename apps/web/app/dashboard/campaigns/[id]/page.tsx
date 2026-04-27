@@ -46,7 +46,7 @@ export default async function CampaignDetailPage({
     ? Math.round((counts.delivered / counts.total) * 100)
     : 0
 
-  const existingContactIds = new Set((campaignContacts ?? []).map(cc => cc.contact_id))
+  const existingContactIds = (campaignContacts ?? []).map(cc => cc.contact_id)
   const allTags = Array.from(new Set((allContacts ?? []).flatMap(c => c.tags ?? []))).sort()
 
   const statusStyle: Record<string, string> = {

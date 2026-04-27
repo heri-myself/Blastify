@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import { useRouter } from 'next/navigation'
 import { addContactsToCampaign } from './contact-actions'
 
 interface Contact {
@@ -15,11 +16,13 @@ interface Contact {
 interface Props {
   campaignId: string
   contacts: Contact[]
-  existingContactIds: Set<string>
+  existingContactIds: string[]
   allTags: string[]
 }
 
 export function ContactSelector({ campaignId, contacts, existingContactIds, allTags }: Props) {
+  const router = useRouter()
+  const existingSet = useMemo(() => new Set(existingContactIds), [existingContactIds])
   const [search, setSearch] = useState('')
   const [filterTag, setFilterTag] = useState('')
   const [filterStatus, setFilterStatus] = useState('')
@@ -30,7 +33,7 @@ export function ContactSelector({ campaignId, contacts, existingContactIds, allT
 
   const filtered = useMemo(() => {
     return contacts.filter(c => {
-      if (existingContactIds.has(c.id)) return false
+      if (existingSet.has(c.id)) return false
       if (filterStatus === 'aktif' && (c.is_blocked || c.opt_out_at)) return false
       if (filterStatus === 'blocked' && !c.is_blocked) return false
       if (filterStatus === 'optout' && !c.opt_out_at) return false
@@ -41,7 +44,7 @@ export function ContactSelector({ campaignId, contacts, existingContactIds, allT
       }
       return true
     })
-  }, [contacts, existingContactIds, filterStatus, filterTag, search])
+  }, [contacts, existingSet, filterStatus, filterTag, search])
 
   const allFilteredSelected = filtered.length > 0 && filtered.every(c => selected.has(c.id))
 
@@ -82,6 +85,7 @@ export function ContactSelector({ campaignId, contacts, existingContactIds, allT
       setMessage(`✓ ${result.count} kontak ditambahkan`)
       setIsError(false)
       setSelected(new Set())
+      router.refresh()
     }
     setLoading(false)
   }
