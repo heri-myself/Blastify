@@ -44,12 +44,6 @@ export default async function NewCampaignPage() {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="filter_tags">Filter Tag Kontak (opsional)</Label>
-          <Input id="filter_tags" name="filter_tags" placeholder="pelanggan,vip (pisah koma)" />
-          <p className="text-xs text-gray-400">Kosongkan untuk kirim ke semua kontak aktif</p>
-        </div>
-
-        <div className="space-y-2">
           <Label htmlFor="message_type">Tipe Pesan</Label>
           <select id="message_type" name="message_type"
             className="w-full border rounded-md px-3 py-2 text-sm" defaultValue="text">
