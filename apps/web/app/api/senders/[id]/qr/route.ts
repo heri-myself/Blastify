@@ -1,4 +1,5 @@
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { getUserRole } from '@/lib/get-user-role'
 import { NextResponse } from 'next/server'
 
 export async function GET(
@@ -6,17 +7,20 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const profile = await getUserRole()
+  if (!profile) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { data: sender } = await supabase
+  const admin = createAdminClient()
+  const { data: sender } = await admin
     .from('sender_phones')
     .select('session_data, status, user_id')
     .eq('id', id)
     .single()
 
-  if (!sender || sender.user_id !== user.id) {
+  if (!sender) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+
+  // User biasa hanya bisa akses sender miliknya sendiri
+  if (profile.role !== 'superadmin' && sender.user_id !== profile.userId) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
 
