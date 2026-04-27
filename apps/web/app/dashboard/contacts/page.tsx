@@ -2,17 +2,43 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { getUserRole } from '@/lib/get-user-role'
 import { ImportForm } from './import-form'
 import { AddContactForm } from './add-contact-form'
+import { ContactFilters } from './contact-filters'
 import { deleteContact } from './actions'
 
-export default async function ContactsPage() {
+interface Props {
+  searchParams: Promise<{ q?: string; status?: string; user?: string }>
+}
+
+export default async function ContactsPage({ searchParams }: Props) {
+  const { q, status, user } = await searchParams
   const profile = await getUserRole()
   const admin = createAdminClient()
   const isSuperadmin = profile?.role === 'superadmin'
 
-  const query = admin.from('contacts').select('*').order('created_at', { ascending: false }).limit(200)
-  const { data: contacts } = isSuperadmin
-    ? await query
-    : await query.eq('user_id', profile!.userId)
+  let query = admin.from('contacts').select('*').order('created_at', { ascending: false }).limit(500)
+
+  if (!isSuperadmin) {
+    query = query.eq('user_id', profile!.userId)
+  } else if (user) {
+    query = query.eq('user_id', user)
+  }
+
+  if (status === 'blocked') query = query.eq('is_blocked', true)
+  else if (status === 'optout') query = query.not('opt_out_at', 'is', null)
+  else if (status === 'aktif') query = query.eq('is_blocked', false).is('opt_out_at', null)
+
+  if (q) {
+    query = query.or(`phone.ilike.%${q}%,name.ilike.%${q}%`)
+  }
+
+  const { data: contacts } = await query
+
+  let users: Array<{ id: string; email: string }> = []
+  if (isSuperadmin) {
+    const { data } = await admin.auth.admin.listUsers({ perPage: 200 })
+    users = (data?.users ?? []).map(u => ({ id: u.id, email: u.email ?? u.id.slice(0, 8) }))
+      .sort((a, b) => a.email.localeCompare(b.email))
+  }
 
   return (
     <div>
@@ -31,6 +57,8 @@ export default async function ContactsPage() {
         </div>
       </div>
 
+      <ContactFilters isSuperadmin={isSuperadmin} users={users} />
+
       <div className="bg-white rounded-xl border border-[#e8e8e6] overflow-hidden">
         <table className="w-full text-sm">
           <thead>
@@ -39,6 +67,9 @@ export default async function ContactsPage() {
               <th className="text-left px-4 py-3 text-[12px] font-medium text-[#7a7a7a] uppercase tracking-wider">Nama</th>
               <th className="text-left px-4 py-3 text-[12px] font-medium text-[#7a7a7a] uppercase tracking-wider">Tags</th>
               <th className="text-left px-4 py-3 text-[12px] font-medium text-[#7a7a7a] uppercase tracking-wider">Status</th>
+              {isSuperadmin && (
+                <th className="text-left px-4 py-3 text-[12px] font-medium text-[#7a7a7a] uppercase tracking-wider">User</th>
+              )}
               <th className="px-4 py-3" />
             </tr>
           </thead>
@@ -65,6 +96,11 @@ export default async function ContactsPage() {
                     <span className="text-[12px] px-2.5 py-1 rounded-full bg-[#f0fdf4] text-[#25D366] font-medium">Aktif</span>
                   )}
                 </td>
+                {isSuperadmin && (
+                  <td className="px-4 py-3 text-[12px] text-[#7a7a7a] max-w-[160px] truncate">
+                    {users.find(u => u.id === contact.user_id)?.email ?? contact.user_id?.slice(0, 8)}
+                  </td>
+                )}
                 <td className="px-4 py-3 text-right">
                   <form action={async () => { 'use server'; await deleteContact(contact.id) }}>
                     <button type="submit" className="text-[13px] text-[#a0a0a0] hover:text-red-500 transition-colors font-medium">
@@ -76,14 +112,20 @@ export default async function ContactsPage() {
             ))}
             {!contacts?.length && (
               <tr>
-                <td colSpan={5} className="px-4 py-12 text-center text-[#a0a0a0] text-[13px]">
-                  Belum ada kontak. Import CSV untuk memulai.
+                <td colSpan={isSuperadmin ? 6 : 5} className="px-4 py-12 text-center text-[#a0a0a0] text-[13px]">
+                  {q || status || user ? 'Tidak ada kontak yang cocok dengan filter.' : 'Belum ada kontak. Import CSV untuk memulai.'}
                 </td>
               </tr>
             )}
           </tbody>
         </table>
       </div>
+
+      {contacts && contacts.length > 0 && (
+        <p className="text-[12px] text-[#a0a0a0] mt-3 text-right">
+          Menampilkan {contacts.length} kontak
+        </p>
+      )}
     </div>
   )
 }
