@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getUserRole } from '@/lib/get-user-role'
-import { deleteCampaign } from './actions'
+import { DeleteCampaignButton } from './delete-campaign-button'
 
 const statusStyle: Record<string, string> = {
   draft:      'bg-[#f2f2f0] text-[#7a7a7a]',
@@ -87,11 +87,7 @@ export default async function CampaignsPage() {
                     <Link href={`/dashboard/campaigns/${campaign.id}`} className="text-[13px] font-medium text-[#111111] hover:text-[#25D366] transition-colors">
                       Detail →
                     </Link>
-                    <form action={async () => { 'use server'; await deleteCampaign(campaign.id) }}>
-                      <button type="submit" className="text-[13px] text-[#a0a0a0] hover:text-red-500 transition-colors font-medium">
-                        Hapus
-                      </button>
-                    </form>
+                    <DeleteCampaignButton campaignId={campaign.id} campaignName={campaign.name} />
                   </div>
                 </td>
               </tr>

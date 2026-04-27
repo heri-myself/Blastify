@@ -3,7 +3,7 @@ import { pauseCampaign, resumeCampaign } from '../actions'
 import { Button } from '@/components/ui/button'
 import { notFound } from 'next/navigation'
 import { EditMessageForm } from './edit-message-form'
-import { DeleteCampaignButton } from './delete-campaign-button'
+import { DeleteCampaignButton } from '../delete-campaign-button'
 import { CampaignContactList } from './campaign-contact-list'
 import { ContactSelector } from './contact-selector'
 import { getUserRole } from '@/lib/get-user-role'
@@ -86,7 +86,7 @@ export default async function CampaignDetailPage({
               <Button type="submit">Lanjutkan</Button>
             </form>
           )}
-          <DeleteCampaignButton campaignId={id} />
+          <DeleteCampaignButton campaignId={id} campaignName={campaign.name} variant="button" />
         </div>
       </div>
 
