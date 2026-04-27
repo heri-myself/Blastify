@@ -5,7 +5,7 @@ import { QRButton } from './qr-button'
 import { AddSenderAdminForm } from './add-sender-admin-form'
 
 const statusStyle: Record<string, string> = {
-  active:      'bg-[#f0fdf4] text-[#25D366]',
+  active:      'bg-[#25D366] text-white shadow-sm',
   warmup:      'bg-amber-50 text-amber-600',
   soft_banned: 'bg-red-50 text-red-500',
   recovering:  'bg-orange-50 text-orange-500',
@@ -103,9 +103,19 @@ export default async function SendersPage() {
                 <td className="px-4 py-3 font-mono text-[13px] text-[#111111]">{sender.phone_number}</td>
                 <td className="px-4 py-3 text-[13px] text-[#111111]">{sender.display_name ?? '—'}</td>
                 <td className="px-4 py-3">
-                  <span className={`text-[12px] px-2.5 py-1 rounded-full font-medium ${statusStyle[sender.status] ?? ''}`}>
-                    {statusLabel[sender.status] ?? sender.status}
-                  </span>
+                  {sender.status === 'active' ? (
+                    <span className={`inline-flex items-center gap-1.5 text-[12px] px-2.5 py-1 rounded-full font-medium ${statusStyle.active}`}>
+                      <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-white" />
+                      </span>
+                      {statusLabel.active}
+                    </span>
+                  ) : (
+                    <span className={`text-[12px] px-2.5 py-1 rounded-full font-medium ${statusStyle[sender.status] ?? ''}`}>
+                      {statusLabel[sender.status] ?? sender.status}
+                    </span>
+                  )}
                 </td>
                 <td className="px-4 py-3 text-[13px] text-[#7a7a7a]">{sender.warmup_day}/14</td>
                 <td className="px-4 py-3 text-[13px] text-[#7a7a7a]">{sender.daily_sent}</td>
