@@ -9,7 +9,6 @@ import {
   Image,
   Smartphone,
   ShieldCheck,
-  Radio,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -23,8 +22,6 @@ const navItems = [
 
 const adminItems = [
   { href: '/admin/users', label: 'Kelola User', icon: ShieldCheck },
-  { href: '/admin/senders', label: 'Semua Sender', icon: Smartphone },
-  { href: '/admin/campaigns', label: 'History Broadcast', icon: Radio },
 ]
 
 export function Sidebar({ role }: { role?: string }) {
