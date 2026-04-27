@@ -8,6 +8,7 @@ import {
   Megaphone,
   Image,
   Smartphone,
+  ShieldCheck,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -19,15 +20,22 @@ const navItems = [
   { href: '/dashboard/senders', label: 'Sender WA', icon: Smartphone },
 ]
 
-export function Sidebar() {
+const adminItems = [
+  { href: '/admin/users', label: 'Kelola User', icon: ShieldCheck },
+]
+
+export function Sidebar({ role }: { role?: string }) {
   const pathname = usePathname()
+
+  const allItems = role === 'superadmin' ? [...navItems, ...adminItems] : navItems
+
   return (
     <aside className="w-56 bg-white border-r min-h-screen flex flex-col py-6 px-3">
       <div className="px-3 mb-6">
         <span className="font-bold text-lg text-gray-900">WA Broadcast</span>
       </div>
       <nav className="flex flex-col gap-1">
-        {navItems.map((item) => {
+        {allItems.map((item) => {
           const Icon = item.icon
           const active = pathname === item.href
           return (

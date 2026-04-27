@@ -2,18 +2,13 @@ import { redirect } from 'next/navigation'
 import { getUserRole } from '@/lib/get-user-role'
 import { Sidebar } from '@/components/sidebar'
 
-export default async function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const profile = await getUserRole()
-  if (!profile) redirect('/login')
-  if (!profile.isActive) redirect('/login?error=account_disabled')
+  if (!profile || profile.role !== 'superadmin') redirect('/dashboard')
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <Sidebar role={profile.role} />
+      <Sidebar role="superadmin" />
       <div className="flex-1 flex flex-col">
         <header className="bg-white border-b px-6 py-3 flex justify-between items-center">
           <span className="text-sm text-gray-500">{profile.email}</span>

@@ -28,7 +28,9 @@ export async function importContacts(contacts: Array<{ phone: string; name?: str
 
 export async function deleteContact(id: string) {
   const supabase = await createClient()
-  const { error } = await supabase.from('contacts').delete().eq('id', id)
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Unauthorized' }
+  const { error } = await supabase.from('contacts').delete().eq('id', id).eq('user_id', user.id)
   if (error) return { error: error.message }
   revalidatePath('/dashboard/contacts')
   return { success: true }
