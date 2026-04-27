@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { pauseCampaign, resumeCampaign } from '../actions'
 import { Button } from '@/components/ui/button'
 import { notFound } from 'next/navigation'
@@ -11,11 +11,11 @@ export default async function CampaignDetailPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  const supabase = await createClient()
+  const admin = createAdminClient()
 
   const [{ data: campaign }, { data: stats }] = await Promise.all([
-    supabase.from('campaigns').select('*, campaign_messages(*)').eq('id', id).single(),
-    supabase.from('campaign_contacts').select('status').eq('campaign_id', id),
+    admin.from('campaigns').select('*, campaign_messages(*)').eq('id', id).single(),
+    admin.from('campaign_contacts').select('status').eq('campaign_id', id),
   ])
 
   if (!campaign) notFound()
@@ -33,17 +33,31 @@ export default async function CampaignDetailPage({
     ? Math.round((counts.delivered / counts.total) * 100)
     : 0
 
+  const statusStyle: Record<string, string> = {
+    draft: 'bg-[#f2f2f0] text-[#7a7a7a]', scheduled: 'bg-blue-50 text-blue-600',
+    running: 'bg-amber-50 text-amber-600', paused: 'bg-orange-50 text-orange-500',
+    done: 'bg-[#f0fdf4] text-[#25D366]', failed: 'bg-red-50 text-red-500',
+  }
+  const statusLabel: Record<string, string> = {
+    draft: 'Draft', scheduled: 'Terjadwal', running: 'Berjalan',
+    paused: 'Dijeda', done: 'Selesai', failed: 'Gagal',
+  }
+
   return (
     <div className="max-w-3xl">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{campaign.name}</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Status: <strong>{campaign.status}</strong>
+          <h1 className="text-xl font-semibold text-[#111111]">{campaign.name}</h1>
+          <div className="flex items-center gap-2 mt-1">
+            <span className={`text-[12px] px-2.5 py-1 rounded-full font-medium ${statusStyle[campaign.status]}`}>
+              {statusLabel[campaign.status]}
+            </span>
             {campaign.scheduled_at && (
-              <> · Jadwal: {new Date(campaign.scheduled_at).toLocaleString('id-ID')}</>
+              <span className="text-[13px] text-[#7a7a7a] font-mono">
+                {new Date(campaign.scheduled_at).toLocaleString('id-ID')}
+              </span>
             )}
-          </p>
+          </div>
         </div>
         <div className="flex gap-2">
           {campaign.status === 'running' && (
@@ -69,15 +83,16 @@ export default async function CampaignDetailPage({
           { label: 'Dilewati', value: counts.skipped },
           { label: 'Success Rate', value: `${successRate}%` },
         ].map(stat => (
-          <div key={stat.label} className="bg-white rounded-lg border p-4">
-            <p className="text-sm text-gray-500">{stat.label}</p>
-            <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+          <div key={stat.label} className="bg-white rounded-xl border border-[#e8e8e6] p-4 relative overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-0.5 bg-[#25D366]" />
+            <p className="text-[12px] font-medium text-[#7a7a7a] uppercase tracking-wider">{stat.label}</p>
+            <p className="text-2xl font-bold text-[#111111] mt-1 tabular-nums">{stat.value}</p>
           </div>
         ))}
       </div>
 
       {campaign.campaign_messages?.[0] && (
-        <div className="bg-white rounded-lg border p-4">
+        <div className="bg-white rounded-xl border border-[#e8e8e6] p-5">
           <EditMessageForm
             messageId={campaign.campaign_messages[0].id}
             campaignId={id}
