@@ -1,17 +1,18 @@
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { getUserRole } from '@/lib/get-user-role'
 import { ImportForm } from './import-form'
 import { AddContactForm } from './add-contact-form'
 import { deleteContact } from './actions'
 
 export default async function ContactsPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  const { data: contacts } = await supabase
-    .from('contacts')
-    .select('*')
-    .eq('user_id', user!.id)
-    .order('created_at', { ascending: false })
-    .limit(100)
+  const profile = await getUserRole()
+  const admin = createAdminClient()
+  const isSuperadmin = profile?.role === 'superadmin'
+
+  const query = admin.from('contacts').select('*').order('created_at', { ascending: false }).limit(200)
+  const { data: contacts } = isSuperadmin
+    ? await query
+    : await query.eq('user_id', profile!.userId)
 
   return (
     <div>
