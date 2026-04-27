@@ -15,7 +15,7 @@ interface Props {
 }
 
 const statusBadge: Record<string, string> = {
-  pending:   'bg-[#f2f2f0] text-[#7a7a7a]',
+  pending:   'bg-orange-50 text-orange-500',
   sending:   'bg-blue-50 text-blue-600',
   sent:      'bg-blue-50 text-blue-600',
   delivered: 'bg-[#f0fdf4] text-[#25D366]',
