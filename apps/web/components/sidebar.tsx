@@ -29,7 +29,7 @@ export function Sidebar({ role }: { role?: string }) {
   const allItems = role === 'superadmin' ? [...navItems, ...adminItems] : navItems
 
   return (
-    <aside className="w-56 bg-[#111111] min-h-screen flex flex-col py-5 px-3 shrink-0">
+    <aside className="w-56 bg-white border-r border-[#e8e8e6] min-h-screen flex flex-col py-5 px-3 shrink-0">
       <div className="px-3 mb-7 flex items-center gap-2">
         <div className="w-7 h-7 rounded-lg bg-[#25D366] flex items-center justify-center shrink-0">
           <svg viewBox="0 0 24 24" className="w-4 h-4 fill-white" xmlns="http://www.w3.org/2000/svg">
@@ -37,7 +37,7 @@ export function Sidebar({ role }: { role?: string }) {
             <path d="M12 0C5.373 0 0 5.373 0 12c0 2.125.558 4.115 1.533 5.838L0 24l6.338-1.51A11.93 11.93 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.787 9.787 0 0 1-5.003-1.368l-.36-.213-3.76.896.952-3.653-.235-.374A9.76 9.76 0 0 1 2.182 12C2.182 6.575 6.575 2.182 12 2.182S21.818 6.575 21.818 12 17.425 21.818 12 21.818z"/>
           </svg>
         </div>
-        <span className="font-semibold text-sm text-white tracking-tight">Blastify</span>
+        <span className="font-semibold text-sm text-[#111111] tracking-tight">Blastify</span>
       </div>
 
       <nav className="flex flex-col gap-0.5 flex-1">
@@ -51,8 +51,8 @@ export function Sidebar({ role }: { role?: string }) {
               className={cn(
                 'flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px] font-medium transition-colors duration-150',
                 active
-                  ? 'bg-white/10 text-white'
-                  : 'text-[#8a8a8a] hover:text-white hover:bg-white/5'
+                  ? 'bg-[#f2f2f0] text-[#111111]'
+                  : 'text-[#7a7a7a] hover:text-[#111111] hover:bg-[#f8f8f7]'
               )}
             >
               <Icon size={15} strokeWidth={active ? 2.5 : 2} className={active ? 'text-[#25D366]' : ''} />
@@ -63,7 +63,7 @@ export function Sidebar({ role }: { role?: string }) {
       </nav>
 
       {role === 'superadmin' && (
-        <div className="mt-4 px-3 py-2 rounded-md bg-white/5 border border-white/10">
+        <div className="mt-4 px-3 py-1.5 rounded-md bg-[#f0fdf4] border border-[#bbf7d0]">
           <p className="text-[11px] text-[#25D366] font-semibold uppercase tracking-widest">Superadmin</p>
         </div>
       )}
