@@ -16,14 +16,17 @@ export async function createUser(formData: FormData) {
   const email = (formData.get('email') as string).trim()
   const password = formData.get('password') as string
 
-  const { error } = await admin.auth.admin.createUser({
+  const { data, error } = await admin.auth.admin.createUser({
     email,
     password,
     email_confirm: true,
-    user_metadata: { role: 'user' },
   })
 
   if (error) return { error: error.message }
+
+  // Insert profile manual karena trigger bisa gagal akibat RLS
+  await admin.from('profiles').upsert({ id: data.user.id, role: 'user', is_active: true })
+
   revalidatePath('/admin/users')
   return { success: true }
 }
