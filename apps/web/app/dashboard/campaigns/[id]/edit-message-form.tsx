@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
+import { WhatsAppEditor } from '@/components/whatsapp-editor'
 import { updateCampaignMessage } from '../actions'
 
 interface Props {
@@ -51,7 +51,7 @@ export function EditMessageForm({ messageId, campaignId, initialContent }: Props
       <form onSubmit={handleSubmit} className="space-y-3">
         <input type="hidden" name="message_id" value={messageId} />
         <input type="hidden" name="campaign_id" value={campaignId} />
-        <Textarea name="content" rows={5} defaultValue={initialContent} required />
+        <WhatsAppEditor name="content" rows={5} defaultValue={initialContent} required />
         {error && <p className="text-sm text-red-500">{error}</p>}
         <div className="flex gap-2">
           <Button type="submit" size="sm" disabled={loading}>

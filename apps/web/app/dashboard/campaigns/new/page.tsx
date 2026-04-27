@@ -3,7 +3,7 @@ import { createCampaign } from '../actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
+import { WhatsAppEditor } from '@/components/whatsapp-editor'
 
 export default async function NewCampaignPage() {
   const supabase = await createClient()
@@ -54,14 +54,12 @@ export default async function NewCampaignPage() {
 
         <div className="space-y-2">
           <Label htmlFor="content">Isi Pesan (support spintax)</Label>
-          <Textarea
-            id="content" name="content" required
+          <WhatsAppEditor
+            name="content"
+            required
             placeholder="Halo {nama}! {Promo ini|Penawaran spesial ini} untuk Anda 🎉"
             rows={4}
           />
-          <p className="text-xs text-gray-400">
-            Gunakan {'{nama}'} untuk nama kontak. Spintax: {'{opsi1|opsi2}'}
-          </p>
         </div>
 
         {mediaFiles && mediaFiles.length > 0 && (
