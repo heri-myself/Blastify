@@ -36,6 +36,27 @@ export default async function ContactsPage({ searchParams }: Props) {
 
   const [{ data: contacts }, { data: tagsData }] = await Promise.all([query, tagsQuery])
 
+  let broadcastMap: Record<string, { campaignName: string; status: string }> = {}
+  if (contacts && contacts.length > 0) {
+    const contactIds = contacts.map((c: any) => c.id)
+    const { data: broadcastData } = await admin
+      .from('campaign_contacts')
+      .select('contact_id, status, campaigns(name)')
+      .in('contact_id', contactIds)
+      .order('created_at', { ascending: false })
+
+    if (broadcastData) {
+      for (const row of broadcastData as any[]) {
+        if (!broadcastMap[row.contact_id]) {
+          broadcastMap[row.contact_id] = {
+            campaignName: row.campaigns?.name ?? '—',
+            status: row.status,
+          }
+        }
+      }
+    }
+  }
+
   const allTags = Array.from(new Set((tagsData ?? []).flatMap(c => c.tags ?? []))).sort()
 
   let users: Array<{ id: string; email: string }> = []
@@ -93,13 +114,23 @@ export default async function ContactsPage({ searchParams }: Props) {
                   </div>
                 </td>
                 <td className="px-4 py-3">
-                  {contact.is_blocked ? (
-                    <span className="text-[12px] px-2.5 py-1 rounded-full bg-red-50 text-red-500 font-medium">Blocked</span>
-                  ) : contact.opt_out_at ? (
-                    <span className="text-[12px] px-2.5 py-1 rounded-full bg-[#f2f2f0] text-[#7a7a7a] font-medium">Opt-out</span>
-                  ) : (
-                    <span className="text-[12px] px-2.5 py-1 rounded-full bg-[#f0fdf4] text-[#25D366] font-medium">Aktif</span>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {contact.is_blocked ? (
+                      <span className="text-[12px] px-2.5 py-1 rounded-full bg-red-50 text-red-500 font-medium">Blocked</span>
+                    ) : contact.opt_out_at ? (
+                      <span className="text-[12px] px-2.5 py-1 rounded-full bg-[#f2f2f0] text-[#7a7a7a] font-medium">Opt-out</span>
+                    ) : (
+                      <span className="text-[12px] px-2.5 py-1 rounded-full bg-[#f0fdf4] text-[#25D366] font-medium">Aktif</span>
+                    )}
+                    {broadcastMap[contact.id] && (
+                      <span
+                        title={`Terakhir: ${broadcastMap[contact.id].campaignName} · ${broadcastMap[contact.id].status}`}
+                        className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#f0fdf4] text-[#25D366] cursor-default text-[11px] font-bold"
+                      >
+                        ✓
+                      </span>
+                    )}
+                  </div>
                 </td>
                 {isSuperadmin && (
                   <td className="px-4 py-3 text-[12px] text-[#7a7a7a] max-w-[160px] truncate">
