@@ -4,6 +4,9 @@ import { Button } from '@/components/ui/button'
 import { notFound } from 'next/navigation'
 import { EditMessageForm } from './edit-message-form'
 import { DeleteCampaignButton } from './delete-campaign-button'
+import { CampaignContactList } from './campaign-contact-list'
+import { ContactSelector } from './contact-selector'
+import { getUserRole } from '@/lib/get-user-role'
 
 export default async function CampaignDetailPage({
   params,
@@ -12,26 +15,39 @@ export default async function CampaignDetailPage({
 }) {
   const { id } = await params
   const admin = createAdminClient()
+  const profile = await getUserRole()
 
-  const [{ data: campaign }, { data: stats }] = await Promise.all([
+  const [{ data: campaign }, { data: campaignContacts }, { data: allContacts }] = await Promise.all([
     admin.from('campaigns').select('*, campaign_messages(*)').eq('id', id).single(),
-    admin.from('campaign_contacts').select('status').eq('campaign_id', id),
+    admin
+      .from('campaign_contacts')
+      .select('id, contact_id, status, sent_at, error_code, contacts(name, phone)')
+      .eq('campaign_id', id)
+      .order('created_at', { ascending: true }),
+    admin
+      .from('contacts')
+      .select('id, phone, name, tags, is_blocked, opt_out_at')
+      .eq('user_id', profile!.userId)
+      .order('name', { ascending: true }),
   ])
 
   if (!campaign) notFound()
 
   const counts = {
-    total: stats?.length ?? 0,
-    pending: stats?.filter(s => s.status === 'pending').length ?? 0,
-    sent: stats?.filter(s => s.status === 'sent').length ?? 0,
-    delivered: stats?.filter(s => s.status === 'delivered').length ?? 0,
-    failed: stats?.filter(s => s.status === 'failed').length ?? 0,
-    skipped: stats?.filter(s => s.status === 'skipped').length ?? 0,
+    total: campaignContacts?.length ?? 0,
+    pending: campaignContacts?.filter(s => s.status === 'pending').length ?? 0,
+    sent: campaignContacts?.filter(s => s.status === 'sent').length ?? 0,
+    delivered: campaignContacts?.filter(s => s.status === 'delivered').length ?? 0,
+    failed: campaignContacts?.filter(s => s.status === 'failed').length ?? 0,
+    skipped: campaignContacts?.filter(s => s.status === 'skipped').length ?? 0,
   }
 
   const successRate = counts.total > 0
     ? Math.round((counts.delivered / counts.total) * 100)
     : 0
+
+  const existingContactIds = new Set((campaignContacts ?? []).map(cc => cc.contact_id))
+  const allTags = Array.from(new Set((allContacts ?? []).flatMap(c => c.tags ?? []))).sort()
 
   const statusStyle: Record<string, string> = {
     draft: 'bg-[#f2f2f0] text-[#7a7a7a]', scheduled: 'bg-blue-50 text-blue-600',
@@ -44,7 +60,7 @@ export default async function CampaignDetailPage({
   }
 
   return (
-    <div className="max-w-3xl">
+    <div className="max-w-4xl">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-xl font-semibold text-[#111111]">{campaign.name}</h1>
@@ -92,7 +108,7 @@ export default async function CampaignDetailPage({
       </div>
 
       {campaign.campaign_messages?.[0] && (
-        <div className="bg-white rounded-xl border border-[#e8e8e6] p-5">
+        <div className="bg-white rounded-xl border border-[#e8e8e6] p-5 mb-6">
           <EditMessageForm
             messageId={campaign.campaign_messages[0].id}
             campaignId={id}
@@ -100,6 +116,31 @@ export default async function CampaignDetailPage({
           />
         </div>
       )}
+
+      {/* Kontak Terdaftar */}
+      <div className="bg-white rounded-xl border border-[#e8e8e6] p-5 mb-4">
+        <h2 className="text-[14px] font-semibold text-[#111111] mb-4">
+          Kontak Terdaftar
+          {counts.total > 0 && (
+            <span className="ml-2 text-[12px] font-normal text-[#7a7a7a]">({counts.total})</span>
+          )}
+        </h2>
+        <CampaignContactList
+          campaignId={id}
+          campaignContacts={(campaignContacts ?? []) as any}
+        />
+      </div>
+
+      {/* Tambah Kontak */}
+      <div className="bg-white rounded-xl border border-[#e8e8e6] p-5">
+        <h2 className="text-[14px] font-semibold text-[#111111] mb-4">Tambah Kontak</h2>
+        <ContactSelector
+          campaignId={id}
+          contacts={allContacts ?? []}
+          existingContactIds={existingContactIds}
+          allTags={allTags}
+        />
+      </div>
     </div>
   )
 }
