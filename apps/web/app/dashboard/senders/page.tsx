@@ -2,6 +2,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { getUserRole } from '@/lib/get-user-role'
 import { addSender, deleteSender } from './actions'
 import { QRButton } from './qr-button'
+import { AddSenderAdminForm } from './add-sender-admin-form'
 
 const statusStyle: Record<string, string> = {
   active:      'bg-[#f0fdf4] text-[#25D366]',
@@ -28,11 +29,15 @@ export default async function SendersPage() {
     ? await query
     : await query.eq('user_id', profile!.userId)
 
-  // Untuk superadmin: ambil mapping email
+  // Untuk superadmin: ambil mapping email + list user untuk form
   let emailMap: Record<string, string> = {}
+  let userList: { id: string; email: string }[] = []
   if (isSuperadmin) {
     const { data: { users } } = await admin.auth.admin.listUsers()
     emailMap = Object.fromEntries(users.map(u => [u.id, u.email ?? u.id.slice(0, 8)]))
+    userList = users
+      .filter(u => u.email)
+      .map(u => ({ id: u.id, email: u.email! }))
   }
 
   return (
@@ -45,6 +50,8 @@ export default async function SendersPage() {
             : 'Kelola nomor WhatsApp untuk broadcast'}
         </p>
       </div>
+
+      {isSuperadmin && <AddSenderAdminForm users={userList} />}
 
       {!isSuperadmin && (
         <div className="bg-white rounded-xl border border-[#e8e8e6] p-5 mb-5">

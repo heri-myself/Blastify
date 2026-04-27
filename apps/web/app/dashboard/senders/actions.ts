@@ -2,6 +2,28 @@
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { getUserRole } from '@/lib/get-user-role'
+
+export async function addSenderForUser(formData: FormData) {
+  const profile = await getUserRole()
+  if (!profile || profile.role !== 'superadmin') return { error: 'Unauthorized' }
+
+  const targetUserId = formData.get('target_user_id') as string
+  if (!targetUserId) return { error: 'Pilih user terlebih dahulu' }
+
+  const admin = createAdminClient()
+  const { error } = await admin.from('sender_phones').insert({
+    user_id: targetUserId,
+    phone_number: (formData.get('phone_number') as string).trim(),
+    display_name: (formData.get('display_name') as string)?.trim() || null,
+    status: 'warmup',
+  })
+
+  if (error) return { error: error.message }
+  revalidatePath('/dashboard/senders')
+  return { success: true }
+}
 
 export async function addSender(formData: FormData) {
   const supabase = await createClient()
