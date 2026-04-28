@@ -87,6 +87,7 @@ export default async function SendersPage() {
               <th className="text-left px-4 py-3 text-[12px] font-medium text-[#7a7a7a] uppercase tracking-wider">Nomor</th>
               <th className="text-left px-4 py-3 text-[12px] font-medium text-[#7a7a7a] uppercase tracking-wider">Nama</th>
               <th className="text-left px-4 py-3 text-[12px] font-medium text-[#7a7a7a] uppercase tracking-wider">Status</th>
+              <th className="text-left px-4 py-3 text-[12px] font-medium text-[#7a7a7a] uppercase tracking-wider">WA</th>
               <th className="text-left px-4 py-3 text-[12px] font-medium text-[#7a7a7a] uppercase tracking-wider">Warmup</th>
               <th className="text-left px-4 py-3 text-[12px] font-medium text-[#7a7a7a] uppercase tracking-wider">Terkirim</th>
               <th className="text-left px-4 py-3 text-[12px] font-medium text-[#7a7a7a] uppercase tracking-wider">Pulih Pada</th>
@@ -118,6 +119,21 @@ export default async function SendersPage() {
                     </span>
                   )}
                 </td>
+                <td className="px-4 py-3">
+                  {(sender.session_data as any)?.connected === true ? (
+                    <span className="inline-flex items-center gap-1 text-[12px] font-medium text-[#25D366]">
+                      <span className="relative flex h-1.5 w-1.5">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#25D366] opacity-75" />
+                        <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#25D366]" />
+                      </span>
+                      Online
+                    </span>
+                  ) : (sender.session_data as any)?.qr ? (
+                    <span className="text-[12px] font-medium text-amber-500">Scan QR</span>
+                  ) : (
+                    <span className="text-[12px] text-[#a0a0a0]">Offline</span>
+                  )}
+                </td>
                 <td className="px-4 py-3 text-[13px] text-[#7a7a7a]">{sender.warmup_day}/14</td>
                 <td className="px-4 py-3 text-[13px] text-[#7a7a7a]">{sender.daily_sent}</td>
                 <td className="px-4 py-3 text-[13px] text-[#7a7a7a] font-mono">
@@ -135,7 +151,7 @@ export default async function SendersPage() {
             ))}
             {!senders?.length && (
               <tr>
-                <td colSpan={isSuperadmin ? 7 : 8} className="px-4 py-12 text-center text-[#a0a0a0] text-[13px]">
+                <td colSpan={isSuperadmin ? 8 : 9} className="px-4 py-12 text-center text-[#a0a0a0] text-[13px]">
                   Belum ada nomor sender.
                 </td>
               </tr>
