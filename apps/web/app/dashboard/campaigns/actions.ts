@@ -63,6 +63,18 @@ export async function resumeCampaign(id: string) {
   revalidatePath(`/dashboard/campaigns/${id}`)
 }
 
+export async function scheduleCampaign(id: string, scheduledAtLocal: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return
+  const scheduledAt = new Date(scheduledAtLocal + ':00+07:00').toISOString()
+  await supabase.from('campaigns').update({
+    status: 'scheduled',
+    scheduled_at: scheduledAt,
+  }).eq('id', id).eq('user_id', user.id).in('status', ['draft', 'scheduled'])
+  revalidatePath(`/dashboard/campaigns/${id}`)
+}
+
 export async function sendNowCampaign(id: string) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
