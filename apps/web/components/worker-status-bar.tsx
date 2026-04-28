@@ -24,14 +24,6 @@ interface WorkerStatus {
   }>
 }
 
-function Segment({ children, className = '' }: { children: React.ReactNode; className?: string }) {
-  return (
-    <div className={`flex flex-col justify-center px-6 py-3 border-r border-[#e8e8e6] last:border-r-0 flex-1 ${className}`}>
-      {children}
-    </div>
-  )
-}
-
 export function WorkerStatusBar() {
   const [status, setStatus] = useState<WorkerStatus | null>(null)
   const [loading, setLoading] = useState(true)
@@ -62,74 +54,74 @@ export function WorkerStatusBar() {
   const sentToday = status?.worker.messagesSentToday ?? 0
 
   return (
-    <div className="flex bg-white border-b border-[#e8e8e6] shadow-sm text-[12px] w-full">
+    <div className="flex rounded-xl border border-[#e8e8e6] bg-white overflow-hidden shadow-sm text-[12px] mb-6">
 
-        {/* Worker Engine */}
-        <Segment>
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-[#b0b0b0] mb-1">Worker Engine</p>
-          <div className="flex items-center gap-2">
-            <span className="relative flex h-2.5 w-2.5">
-              {loading ? (
-                <span className="h-2.5 w-2.5 rounded-full bg-gray-200" />
-              ) : isOnline ? (
-                <>
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#25D366] opacity-50" />
-                  <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[#25D366]" />
-                </>
-              ) : (
-                <span className="h-2.5 w-2.5 rounded-full bg-red-400" />
-              )}
-            </span>
-            <span className={`font-semibold ${loading ? 'text-[#ccc]' : isOnline ? 'text-[#111]' : 'text-red-500'}`}>
-              {loading ? 'Memuat...' : isOnline ? 'Online' : 'Offline'}
-            </span>
-            {!loading && isOnline && (status?.worker.secondsAgo ?? 0) > 0 && (
-              <span className="text-[10px] text-[#ccc]">{status!.worker.secondsAgo}s ago</span>
-            )}
-          </div>
-        </Segment>
-
-        {/* Sender WA */}
-        <Segment>
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-[#b0b0b0] mb-1">Sender WA</p>
-          <div className="flex items-center gap-1.5">
-            <span className={`text-lg font-bold tabular-nums leading-none ${connectedSenders > 0 ? 'text-[#25D366]' : 'text-[#ccc]'}`}>
-              {connectedSenders}
-            </span>
-            <span className="text-[#ccc] font-light text-base leading-none">/</span>
-            <span className="text-[#111] font-semibold text-base leading-none">{totalSenders}</span>
-            <span className="text-[#b0b0b0] ml-1">terhubung</span>
-          </div>
-        </Segment>
-
-        {/* Campaign */}
-        <Segment>
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-[#b0b0b0] mb-1">Campaign</p>
-          <div className="flex items-center gap-2">
-            {running > 0 ? (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 text-amber-600 font-semibold text-[11px]">
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-                {running} Berjalan
-              </span>
+      {/* Worker Engine */}
+      <div className="flex flex-col justify-center px-5 py-3 border-r border-[#e8e8e6] flex-1">
+        <p className="text-[10px] font-semibold uppercase tracking-widest text-[#b0b0b0] mb-1">Worker Engine</p>
+        <div className="flex items-center gap-2">
+          <span className="relative flex h-2.5 w-2.5 shrink-0">
+            {loading ? (
+              <span className="h-2.5 w-2.5 rounded-full bg-gray-200" />
+            ) : isOnline ? (
+              <>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#25D366] opacity-50" />
+                <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[#25D366]" />
+              </>
             ) : (
-              <span className="text-[#b0b0b0] font-medium">Idle</span>
+              <span className="h-2.5 w-2.5 rounded-full bg-red-400" />
             )}
-            {scheduled > 0 && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 text-blue-500 font-semibold text-[11px]">
-                {scheduled} Terjadwal
-              </span>
-            )}
-          </div>
-        </Segment>
+          </span>
+          <span className={`font-semibold ${loading ? 'text-[#ccc]' : isOnline ? 'text-[#111]' : 'text-red-500'}`}>
+            {loading ? 'Memuat...' : isOnline ? 'Online' : 'Offline'}
+          </span>
+          {!loading && isOnline && (status?.worker.secondsAgo ?? 0) > 0 && (
+            <span className="text-[10px] text-[#ccc]">{status!.worker.secondsAgo}s ago</span>
+          )}
+        </div>
+      </div>
 
-        {/* Messages Today */}
-        <Segment>
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-[#b0b0b0] mb-1">Terkirim Hari Ini</p>
-          <div className="flex items-baseline gap-1">
-            <span className="text-lg font-bold tabular-nums text-[#111] leading-none">{sentToday}</span>
-            <span className="text-[#b0b0b0]">pesan</span>
-          </div>
-        </Segment>
+      {/* Sender WA */}
+      <div className="flex flex-col justify-center px-5 py-3 border-r border-[#e8e8e6] flex-1">
+        <p className="text-[10px] font-semibold uppercase tracking-widest text-[#b0b0b0] mb-1">Sender WA</p>
+        <div className="flex items-baseline gap-1">
+          <span className={`text-lg font-bold tabular-nums leading-none ${connectedSenders > 0 ? 'text-[#25D366]' : 'text-[#ccc]'}`}>
+            {connectedSenders}
+          </span>
+          <span className="text-[#ccc] font-light text-base leading-none">/</span>
+          <span className="text-[#111] font-semibold text-base leading-none">{totalSenders}</span>
+          <span className="text-[#b0b0b0] ml-1">terhubung</span>
+        </div>
+      </div>
+
+      {/* Campaign */}
+      <div className="flex flex-col justify-center px-5 py-3 border-r border-[#e8e8e6] flex-1">
+        <p className="text-[10px] font-semibold uppercase tracking-widest text-[#b0b0b0] mb-1">Campaign</p>
+        <div className="flex items-center gap-2 flex-wrap">
+          {running > 0 ? (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 text-amber-600 font-semibold text-[11px]">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+              {running} Berjalan
+            </span>
+          ) : (
+            <span className="text-[#b0b0b0] font-medium">Idle</span>
+          )}
+          {scheduled > 0 && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 text-blue-500 font-semibold text-[11px]">
+              {scheduled} Terjadwal
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Messages Today */}
+      <div className="flex flex-col justify-center px-5 py-3 flex-1">
+        <p className="text-[10px] font-semibold uppercase tracking-widest text-[#b0b0b0] mb-1">Terkirim Hari Ini</p>
+        <div className="flex items-baseline gap-1">
+          <span className="text-lg font-bold tabular-nums text-[#111] leading-none">{sentToday}</span>
+          <span className="text-[#b0b0b0]">pesan</span>
+        </div>
+      </div>
 
     </div>
   )

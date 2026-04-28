@@ -1,6 +1,7 @@
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getUserRole } from '@/lib/get-user-role'
 import { StatCard } from '@/components/stat-card'
+import { WorkerStatusBar } from '@/components/worker-status-bar'
 
 export default async function DashboardPage() {
   const profile = await getUserRole()
@@ -27,10 +28,11 @@ export default async function DashboardPage() {
 
     return (
       <div>
-        <div className="mb-6">
+        <div className="mb-4">
           <h1 className="text-xl font-semibold text-[#111111]">Overview</h1>
           <p className="text-[13px] text-[#7a7a7a] mt-0.5">Ringkasan seluruh aktivitas platform</p>
         </div>
+        <WorkerStatusBar />
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard title="Total Kontak" value={totalContacts ?? 0} />
           <StatCard title="Total Campaign" value={totalCampaigns ?? 0} />
