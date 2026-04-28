@@ -1,10 +1,36 @@
 import { createAdminClient } from '@/lib/supabase/admin'
+import { getUserRole } from '@/lib/get-user-role'
 import { NextResponse } from 'next/server'
 
 export const revalidate = 0
 
 export async function GET() {
+  const profile = await getUserRole()
+  if (!profile) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
   const admin = createAdminClient()
+  const isSuperadmin = profile.role === 'superadmin'
+
+  const sendersQuery = admin
+    .from('sender_phones')
+    .select('id, phone_number, status, session_data')
+    .neq('status', 'disabled')
+
+  const campaignsScheduledQuery = admin
+    .from('campaigns')
+    .select('*', { count: 'exact', head: true })
+    .eq('status', 'scheduled')
+
+  const campaignsRunningQuery = admin
+    .from('campaigns')
+    .select('*', { count: 'exact', head: true })
+    .eq('status', 'running')
+
+  if (!isSuperadmin) {
+    sendersQuery.eq('user_id', profile.userId)
+    campaignsScheduledQuery.eq('user_id', profile.userId)
+    campaignsRunningQuery.eq('user_id', profile.userId)
+  }
 
   const [
     { data: heartbeat },
@@ -13,9 +39,9 @@ export async function GET() {
     { count: runningCount },
   ] = await Promise.all([
     admin.from('worker_heartbeats').select('*').eq('id', 'default').single(),
-    admin.from('sender_phones').select('id, phone_number, status, session_data').neq('status', 'disabled'),
-    admin.from('campaigns').select('*', { count: 'exact', head: true }).eq('status', 'scheduled'),
-    admin.from('campaigns').select('*', { count: 'exact', head: true }).eq('status', 'running'),
+    sendersQuery,
+    campaignsScheduledQuery,
+    campaignsRunningQuery,
   ])
 
   const now = Date.now()

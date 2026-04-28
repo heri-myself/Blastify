@@ -49,6 +49,9 @@ export function WorkerStatusBar() {
   const connectedSenders = status?.senders.filter(s => s.connected).length ?? 0
   const totalSenders = status?.senders.length ?? 0
   const isOnline = status?.worker.online ?? false
+
+  // Sembunyikan jika user tidak punya sender
+  if (!loading && totalSenders === 0) return null
   const running = status?.campaigns.running ?? 0
   const scheduled = status?.campaigns.scheduled ?? 0
   const sentToday = status?.worker.messagesSentToday ?? 0
