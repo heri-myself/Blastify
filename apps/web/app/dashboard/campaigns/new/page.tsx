@@ -1,4 +1,20 @@
 import { createClient } from '@/lib/supabase/server'
+
+const senderStatusStyle: Record<string, string> = {
+  active:      'bg-[#25D366] text-white',
+  warmup:      'bg-amber-50 text-amber-600',
+  soft_banned: 'bg-red-50 text-red-500',
+  recovering:  'bg-orange-50 text-orange-500',
+  disabled:    'bg-[#f2f2f0] text-[#7a7a7a]',
+}
+
+const senderStatusLabel: Record<string, string> = {
+  active:      'Aktif',
+  warmup:      'Warm-up',
+  soft_banned: 'Soft Banned',
+  recovering:  'Pemulihan',
+  disabled:    'Nonaktif',
+}
 import { createCampaign } from '../actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -34,24 +50,15 @@ export default async function NewCampaignPage() {
               <label key={s.id} className="flex items-center gap-2 text-sm cursor-pointer">
                 <input type="checkbox" name="sender_ids" value={s.id} />
                 <span>{s.display_name ?? s.phone_number}</span>
-                {s.status === 'active' ? (
-                  <span className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full font-medium bg-[#25D366] text-white">
+                <span className={`inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full font-medium ${senderStatusStyle[s.status] ?? senderStatusStyle.disabled}`}>
+                  {s.status === 'active' && (
                     <span className="relative flex h-1.5 w-1.5">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
                       <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white" />
                     </span>
-                    Aktif
-                  </span>
-                ) : (
-                  <span className={{
-                    warmup:      'text-[11px] px-2 py-0.5 rounded-full font-medium bg-amber-50 text-amber-600',
-                    soft_banned: 'text-[11px] px-2 py-0.5 rounded-full font-medium bg-red-50 text-red-500',
-                    recovering:  'text-[11px] px-2 py-0.5 rounded-full font-medium bg-orange-50 text-orange-500',
-                    disabled:    'text-[11px] px-2 py-0.5 rounded-full font-medium bg-[#f2f2f0] text-[#7a7a7a]',
-                  }[s.status] ?? 'text-[11px] px-2 py-0.5 rounded-full font-medium bg-[#f2f2f0] text-[#7a7a7a]'}>
-                    {{ warmup: 'Warm-up', soft_banned: 'Soft Banned', recovering: 'Pemulihan', disabled: 'Nonaktif' }[s.status] ?? s.status}
-                  </span>
-                )}
+                  )}
+                  {senderStatusLabel[s.status] ?? s.status}
+                </span>
               </label>
             ))}
             {!senders?.length && (
