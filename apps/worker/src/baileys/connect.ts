@@ -21,7 +21,7 @@ export async function createWAConnection(
   senderId: string,
   onQR: (qr: string) => void,
   onReady: () => void,
-  onDisconnect: (shouldReconnect: boolean) => void
+  onDisconnect: (shouldReconnect: boolean) => void | Promise<void>
 ): Promise<WASocket> {
   const authPath = join(AUTH_DIR, senderId)
   const { state, saveCreds } = await useMultiFileAuthState(authPath)
@@ -36,6 +36,7 @@ export async function createWAConnection(
     },
     printQRInTerminal: false,
     generateHighQualityLinkPreview: false,
+    keepAliveIntervalMs: 30_000,
   })
 
   sock.ev.on('creds.update', saveCreds)
