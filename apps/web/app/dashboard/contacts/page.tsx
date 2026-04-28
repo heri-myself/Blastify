@@ -4,6 +4,7 @@ import { ImportForm } from './import-form'
 import { AddContactForm } from './add-contact-form'
 import { ContactFilters } from './contact-filters'
 import { deleteContact } from './actions'
+import { CsvImportWarning } from '@/components/csv-import-warning'
 
 interface Props {
   searchParams: Promise<{ q?: string; status?: string; user?: string; tag?: string }>
@@ -83,6 +84,7 @@ export default async function ContactsPage({ searchParams }: Props) {
         </div>
       </div>
 
+      <CsvImportWarning />
       <ContactFilters isSuperadmin={isSuperadmin} users={users} allTags={allTags} />
 
       <div className="bg-white rounded-xl border border-[#e8e8e6] overflow-hidden">
