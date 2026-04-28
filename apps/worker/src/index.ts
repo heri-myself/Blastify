@@ -1,11 +1,25 @@
 import { config } from './config'
 import { initAllSessions, syncNewSenders } from './baileys/session-manager'
 import { pollOnce } from './scheduler/poll'
+import { supabase } from './supabase'
+
+async function resetStuckCampaigns() {
+  const { data, error } = await supabase
+    .from('campaigns')
+    .update({ status: 'scheduled' })
+    .eq('status', 'running')
+    .select('id, name')
+  if (data?.length) {
+    console.log(`[Worker] Reset ${data.length} campaign stuck 'running' → 'scheduled':`, data.map(c => c.name))
+  }
+  if (error) console.error('[Worker] Gagal reset stuck campaigns:', error.message)
+}
 
 async function main() {
   console.log('[Worker] WA Broadcast Worker v1.0.0 started')
   console.log(`[Worker] Poll interval: ${config.pollIntervalMs / 1000}s`)
 
+  await resetStuckCampaigns()
   await initAllSessions()
   await new Promise(r => setTimeout(r, 5_000))
 

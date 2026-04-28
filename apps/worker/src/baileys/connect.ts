@@ -53,10 +53,6 @@ export async function createWAConnection(
 
     if (connection === 'open') {
       console.log(`[baileys] Sender ${senderId} terhubung`)
-      await supabase.from('sender_phones').update({
-        session_data: { connected: true },
-        status: 'warmup',
-      }).eq('id', senderId)
       onReady()
     }
 
