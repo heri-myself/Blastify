@@ -70,7 +70,7 @@ export default async function CampaignDetailPage({
             </span>
             {campaign.scheduled_at && (
               <span className="text-[13px] text-[#7a7a7a] font-mono">
-                {new Date(campaign.scheduled_at).toLocaleString('id-ID')}
+                {new Date(campaign.scheduled_at).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })}
               </span>
             )}
           </div>

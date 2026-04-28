@@ -62,7 +62,7 @@ export default async function AdminCampaignsPage() {
                   </td>
                   <td className="px-4 py-3 text-[13px] text-[#7a7a7a] tabular-nums">{contactCount.toLocaleString()}</td>
                   <td className="px-4 py-3 text-[13px] text-[#7a7a7a] font-mono">
-                    {c.scheduled_at ? new Date(c.scheduled_at).toLocaleString('id-ID') : '—'}
+                    {c.scheduled_at ? new Date(c.scheduled_at).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' }) : '—'}
                   </td>
                   <td className="px-4 py-3 text-[13px] text-[#7a7a7a] font-mono">
                     {new Date(c.created_at).toLocaleDateString('id-ID')}

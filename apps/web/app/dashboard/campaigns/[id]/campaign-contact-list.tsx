@@ -85,7 +85,7 @@ export function CampaignContactList({ campaignId, campaignContacts }: Props) {
                   )}
                 </td>
                 <td className="px-4 py-3 text-[13px] text-[#7a7a7a]">
-                  {cc.sent_at ? new Date(cc.sent_at).toLocaleString('id-ID') : '—'}
+                  {cc.sent_at ? new Date(cc.sent_at).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' }) : '—'}
                 </td>
                 <td className="px-4 py-3 text-right">
                   {cc.status === 'pending' && (

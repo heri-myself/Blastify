@@ -80,7 +80,7 @@ export default async function CampaignsPage() {
                   </span>
                 </td>
                 <td className="px-4 py-3 text-[13px] text-[#7a7a7a] font-mono">
-                  {campaign.scheduled_at ? new Date(campaign.scheduled_at).toLocaleString('id-ID') : '—'}
+                  {campaign.scheduled_at ? new Date(campaign.scheduled_at).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' }) : '—'}
                 </td>
                 <td className="px-4 py-3 text-right">
                   <div className="flex items-center justify-end gap-3">

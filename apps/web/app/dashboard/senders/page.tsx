@@ -120,7 +120,7 @@ export default async function SendersPage() {
                 <td className="px-4 py-3 text-[13px] text-[#7a7a7a]">{sender.warmup_day}/14</td>
                 <td className="px-4 py-3 text-[13px] text-[#7a7a7a]">{sender.daily_sent}</td>
                 <td className="px-4 py-3 text-[13px] text-[#7a7a7a] font-mono">
-                  {sender.recover_at ? new Date(sender.recover_at).toLocaleString('id-ID') : '—'}
+                  {sender.recover_at ? new Date(sender.recover_at).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' }) : '—'}
                 </td>
                 {!isSuperadmin && (
                   <td className="px-4 py-3">
