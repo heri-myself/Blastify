@@ -9,7 +9,7 @@ export async function importContacts(contacts: Array<{ phone: string; name?: str
   if (!profile) return { error: 'Unauthorized' }
 
   console.log('[importContacts] received contacts sample:', JSON.stringify(contacts.slice(0, 3)))
-  const rows = contacts
+  const rawRows = contacts
     .filter(c => c.phone?.trim())
     .map(c => ({
       user_id: profile.userId,
@@ -17,6 +17,12 @@ export async function importContacts(contacts: Array<{ phone: string; name?: str
       name: c.name?.trim() || null,
       tags: c.tags ? c.tags.split(',').map(t => t.trim()).filter(Boolean) : [],
     }))
+    .filter(c => c.phone.length > 0)
+
+  // Deduplikasi berdasarkan phone — ambil entri terakhir jika ada duplikat dalam CSV
+  const deduped = new Map<string, typeof rawRows[0]>()
+  for (const row of rawRows) deduped.set(row.phone, row)
+  const rows = Array.from(deduped.values())
 
   if (rows.length === 0) return { error: 'Tidak ada data valid', count: 0 }
 
