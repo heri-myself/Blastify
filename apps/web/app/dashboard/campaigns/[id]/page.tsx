@@ -76,7 +76,7 @@ export default async function CampaignDetailPage({
           </div>
         </div>
         <div className="flex gap-2">
-          {(campaign.status === 'draft' || (campaign.status === 'scheduled' && !campaign.scheduled_at)) && (
+          {(campaign.status === 'draft' || campaign.status === 'scheduled') && (
             <form action={async () => { 'use server'; await sendNowCampaign(id) }}>
               <Button type="submit">Kirim Sekarang</Button>
             </form>
