@@ -20,8 +20,8 @@ export const config = {
   warmupLimits: [20, 20, 20, 50, 50, 50, 50, 150, 150, 150, 150, 150, 150, 150, 500],
 
   // Jam aman kirim (WIB = UTC+7)
-  safeSendStartHour: 8,
-  safeSendEndHour: 21,
+  safeSendStartHour: parseInt(process.env.SAFE_SEND_START_HOUR ?? '8'),
+  safeSendEndHour: parseInt(process.env.SAFE_SEND_END_HOUR ?? '22'),
 }
 
 const required = ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY']
