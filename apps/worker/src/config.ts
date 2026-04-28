@@ -21,7 +21,7 @@ export const config = {
 
   // Jam aman kirim (WIB = UTC+7)
   safeSendStartHour: parseInt(process.env.SAFE_SEND_START_HOUR ?? '8'),
-  safeSendEndHour: parseInt(process.env.SAFE_SEND_END_HOUR ?? '22'),
+  safeSendEndHour: parseInt(process.env.SAFE_SEND_END_HOUR ?? '23'),
 }
 
 const required = ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY']
