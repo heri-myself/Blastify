@@ -70,3 +70,19 @@ export function getReadySocket(senderId: string): WASocket | null {
 export function isSessionReady(senderId: string): boolean {
   return sessions.get(senderId)?.ready ?? false
 }
+
+export async function syncNewSenders(): Promise<void> {
+  const { data: senders } = await supabase
+    .from('sender_phones')
+    .select('id')
+    .neq('status', 'disabled')
+
+  if (!senders?.length) return
+
+  for (const sender of senders) {
+    if (!sessions.has(sender.id)) {
+      console.log(`[session-manager] Sender baru ditemukan: ${sender.id}, init sesi...`)
+      await initSession(sender.id)
+    }
+  }
+}

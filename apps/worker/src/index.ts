@@ -1,5 +1,5 @@
 import { config } from './config'
-import { initAllSessions } from './baileys/session-manager'
+import { initAllSessions, syncNewSenders } from './baileys/session-manager'
 import { pollOnce } from './scheduler/poll'
 
 async function main() {
@@ -14,6 +14,7 @@ async function main() {
 
   setInterval(async () => {
     try {
+      await syncNewSenders()
       await pollOnce()
     } catch (err) {
       console.error('[Worker] Poll error:', err)
