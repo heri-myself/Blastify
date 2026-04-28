@@ -26,7 +26,7 @@ interface WorkerStatus {
 
 function Segment({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={`flex flex-col justify-center px-5 py-2.5 border-r border-[#e8e8e6] last:border-r-0 ${className}`}>
+    <div className={`flex flex-col justify-center px-6 py-3 border-r border-[#e8e8e6] last:border-r-0 flex-1 ${className}`}>
       {children}
     </div>
   )
@@ -62,8 +62,7 @@ export function WorkerStatusBar() {
   const sentToday = status?.worker.messagesSentToday ?? 0
 
   return (
-    <div className="px-6 py-3 bg-white border-b border-[#e8e8e6]">
-      <div className="inline-flex rounded-xl border border-[#e8e8e6] overflow-hidden shadow-sm text-[12px] bg-white">
+    <div className="flex bg-white border-b border-[#e8e8e6] shadow-sm text-[12px] w-full">
 
         {/* Worker Engine */}
         <Segment>
@@ -132,7 +131,6 @@ export function WorkerStatusBar() {
           </div>
         </Segment>
 
-      </div>
     </div>
   )
 }
