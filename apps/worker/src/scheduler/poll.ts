@@ -14,11 +14,12 @@ export async function pollOnce(): Promise<void> {
     lastResetDate = today
   }
 
+  const now = new Date().toISOString()
   const { data: campaigns } = await supabase
     .from('campaigns')
     .select('id, name')
     .eq('status', 'scheduled')
-    .lte('scheduled_at', new Date().toISOString())
+    .or(`scheduled_at.is.null,scheduled_at.lte.${now}`)
 
   const queued = campaigns?.filter(c => !runningCampaigns.has(c.id)).length ?? 0
 
