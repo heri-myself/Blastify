@@ -9,7 +9,11 @@ export async function createCampaign(formData: FormData) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Unauthorized' }
 
-  const scheduledAt = formData.get('scheduled_at') as string
+  const scheduledAtRaw = formData.get('scheduled_at') as string
+  // datetime-local input has no timezone — treat as WIB (UTC+7)
+  const scheduledAt = scheduledAtRaw
+    ? new Date(scheduledAtRaw + ':00+07:00').toISOString()
+    : ''
   const senderIds = formData.getAll('sender_ids') as string[]
   const messageType = formData.get('message_type') as string
   const content = formData.get('content') as string
@@ -56,6 +60,17 @@ export async function resumeCampaign(id: string) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return
   await supabase.from('campaigns').update({ status: 'scheduled' }).eq('id', id).eq('user_id', user.id)
+  revalidatePath(`/dashboard/campaigns/${id}`)
+}
+
+export async function sendNowCampaign(id: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return
+  await supabase.from('campaigns').update({
+    status: 'scheduled',
+    scheduled_at: new Date().toISOString(),
+  }).eq('id', id).eq('user_id', user.id).eq('status', 'draft')
   revalidatePath(`/dashboard/campaigns/${id}`)
 }
 

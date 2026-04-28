@@ -29,11 +29,21 @@ export async function runCampaign(campaignId: string): Promise<void> {
 
   const { data: campaign } = await supabase
     .from('campaigns')
-    .select('sender_rotation')
+    .select('sender_rotation, user_id')
     .eq('id', campaignId)
     .single()
 
-  const senderIds: string[] = (campaign?.sender_rotation as string[] | null) ?? []
+  let senderIds: string[] = (campaign?.sender_rotation as string[] | null) ?? []
+
+  if (senderIds.length === 0 && campaign?.user_id) {
+    const { data: allSenders } = await supabase
+      .from('sender_phones')
+      .select('id')
+      .eq('user_id', campaign.user_id)
+      .in('status', ['active', 'warmup', 'recovering'])
+    senderIds = allSenders?.map(s => s.id) ?? []
+    console.log(`[batch] sender_rotation kosong, menggunakan ${senderIds.length} sender aktif milik user`)
+  }
 
   let totalSent = 0
 

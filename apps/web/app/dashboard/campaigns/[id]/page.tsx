@@ -1,5 +1,5 @@
 import { createAdminClient } from '@/lib/supabase/admin'
-import { pauseCampaign, resumeCampaign } from '../actions'
+import { pauseCampaign, resumeCampaign, sendNowCampaign } from '../actions'
 import { Button } from '@/components/ui/button'
 import { notFound } from 'next/navigation'
 import { EditMessageForm } from './edit-message-form'
@@ -76,6 +76,11 @@ export default async function CampaignDetailPage({
           </div>
         </div>
         <div className="flex gap-2">
+          {campaign.status === 'draft' && (
+            <form action={async () => { 'use server'; await sendNowCampaign(id) }}>
+              <Button type="submit">Kirim Sekarang</Button>
+            </form>
+          )}
           {campaign.status === 'running' && (
             <form action={async () => { 'use server'; await pauseCampaign(id) }}>
               <Button variant="outline" type="submit">Pause</Button>
