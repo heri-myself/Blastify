@@ -40,11 +40,11 @@ export async function initSession(senderId: string): Promise<void> {
 
   const sock = await createWAConnection(
     senderId,
-    async (qr) => {
-      console.log(`[session-manager] QR untuk ${senderId}: ${qr.substring(0, 30)}...`)
+    async (qrDataUrl) => {
+      console.log(`[session-manager] QR untuk ${senderId}: (base64 image)`)
       await supabase
         .from('sender_phones')
-        .update({ session_data: { qr, connected: false } })
+        .update({ session_data: { qr: qrDataUrl, qr_at: new Date().toISOString(), connected: false } })
         .eq('id', senderId)
     },
     async () => {

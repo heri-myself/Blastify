@@ -45,11 +45,8 @@ export async function createWAConnection(
     const { connection, lastDisconnect, qr } = update
 
     if (qr) {
-      onQR(qr)
       const qrDataUrl = await QRCode.toDataURL(qr, { width: 300, margin: 2 })
-      await supabase.from('sender_phones').update({
-        session_data: { qr: qrDataUrl, qr_at: new Date().toISOString() }
-      }).eq('id', senderId)
+      onQR(qrDataUrl)
     }
 
     if (connection === 'open') {
