@@ -41,7 +41,7 @@ export async function GET() {
       id: s.id,
       phone: s.phone_number,
       status: s.status,
-      connected: (s.session_data as any)?.connected ?? false,
+      connected: s.status === 'active' && ((s.session_data as any)?.connected !== false),
     })),
   })
 }
