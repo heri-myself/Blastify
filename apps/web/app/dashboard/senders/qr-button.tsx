@@ -89,7 +89,7 @@ export function QRButton({ senderId }: { senderId: string }) {
           <div className="p-3 relative">
             <div className={`transition-opacity duration-300 ${countdown <= 10 ? 'opacity-40' : 'opacity-100'}`}>
               <Image
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qr)}`}
+                src={qr}
                 alt="QR Code"
                 width={200}
                 height={200}

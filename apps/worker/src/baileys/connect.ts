@@ -9,6 +9,7 @@ import { Boom } from '@hapi/boom'
 import { join } from 'path'
 import { supabase } from '../supabase'
 import pino from 'pino'
+import QRCode from 'qrcode'
 
 const logger = pino({ level: 'warn' })
 
@@ -44,8 +45,9 @@ export async function createWAConnection(
 
     if (qr) {
       onQR(qr)
+      const qrDataUrl = await QRCode.toDataURL(qr, { width: 300, margin: 2 })
       await supabase.from('sender_phones').update({
-        session_data: { qr, qr_at: new Date().toISOString() }
+        session_data: { qr: qrDataUrl, qr_at: new Date().toISOString() }
       }).eq('id', senderId)
     }
 
