@@ -1,6 +1,7 @@
 import { supabase } from '../supabase'
 import { runCampaign } from '../sender/batch-runner'
 import { resetDailyCounters } from '../antiban/warmup'
+import { sendHeartbeat } from '../heartbeat'
 
 const runningCampaigns = new Set<string>()
 let lastResetDate = new Date().toDateString()
@@ -18,6 +19,10 @@ export async function pollOnce(): Promise<void> {
     .select('id, name')
     .eq('status', 'scheduled')
     .lte('scheduled_at', new Date().toISOString())
+
+  const queued = campaigns?.filter(c => !runningCampaigns.has(c.id)).length ?? 0
+
+  await sendHeartbeat(runningCampaigns.size, queued).catch(() => {})
 
   if (!campaigns?.length) return
 

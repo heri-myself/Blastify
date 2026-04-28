@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { getUserRole } from '@/lib/get-user-role'
 import { Sidebar } from '@/components/sidebar'
+import { WorkerStatusBar } from '@/components/worker-status-bar'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const profile = await getUserRole()
@@ -31,6 +32,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
             </form>
           </div>
         </header>
+        <WorkerStatusBar />
         <main className="p-6 flex-1">{children}</main>
       </div>
     </div>
