@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { SubmitButton } from '@/components/submit-button'
 
 const senderStatusStyle: Record<string, string> = {
   active:      'bg-[#25D366] text-white',
@@ -16,7 +17,6 @@ const senderStatusLabel: Record<string, string> = {
   disabled:    'Nonaktif',
 }
 import { createCampaign } from '../actions'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { WhatsAppEditor } from '@/components/whatsapp-editor'
@@ -106,7 +106,7 @@ export default async function NewCampaignPage() {
         </div>
 
         <div className="flex gap-3">
-          <Button type="submit">Simpan Campaign</Button>
+          <SubmitButton pendingText="Menyimpan...">Simpan Campaign</SubmitButton>
           <a href="/dashboard/campaigns"
             className="inline-flex items-center justify-center rounded-lg border border-border bg-background h-8 px-2.5 text-sm font-medium hover:bg-muted transition-all">
             Batal

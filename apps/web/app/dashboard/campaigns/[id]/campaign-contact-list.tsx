@@ -1,3 +1,7 @@
+'use client'
+
+import { useTransition } from 'react'
+import { useRouter } from 'next/navigation'
 import { removeContactFromCampaign, retryContactBroadcast, removePendingContacts } from './contact-actions'
 
 interface CampaignContact {
@@ -32,6 +36,65 @@ const statusLabel: Record<string, string> = {
   skipped:   'Dilewati',
 }
 
+const Spinner = () => (
+  <svg className="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
+    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+  </svg>
+)
+
+function RemoveContactButton({ ccId, campaignId }: { ccId: string; campaignId: string }) {
+  const [isPending, startTransition] = useTransition()
+  const router = useRouter()
+  return (
+    <button
+      onClick={() => startTransition(async () => {
+        await removeContactFromCampaign(ccId, campaignId)
+        router.refresh()
+      })}
+      disabled={isPending}
+      className="inline-flex items-center gap-1 text-[13px] text-[#a0a0a0] hover:text-red-500 transition-colors font-medium disabled:opacity-50"
+    >
+      {isPending ? <Spinner /> : 'Hapus'}
+    </button>
+  )
+}
+
+function RetryContactButton({ ccId, campaignId }: { ccId: string; campaignId: string }) {
+  const [isPending, startTransition] = useTransition()
+  const router = useRouter()
+  return (
+    <button
+      onClick={() => startTransition(async () => {
+        await retryContactBroadcast(ccId, campaignId)
+        router.refresh()
+      })}
+      disabled={isPending}
+      className="inline-flex items-center gap-1 text-[13px] text-[#a0a0a0] hover:text-blue-500 transition-colors font-medium disabled:opacity-50"
+    >
+      {isPending ? <Spinner /> : 'Retry'}
+    </button>
+  )
+}
+
+function RemoveAllPendingButton({ campaignId, pendingCount }: { campaignId: string; pendingCount: number }) {
+  const [isPending, startTransition] = useTransition()
+  const router = useRouter()
+  return (
+    <button
+      onClick={() => startTransition(async () => {
+        await removePendingContacts(campaignId)
+        router.refresh()
+      })}
+      disabled={isPending}
+      className="inline-flex items-center gap-1.5 text-[12px] text-red-500 hover:text-red-700 transition-colors disabled:opacity-50"
+    >
+      {isPending && <Spinner />}
+      {isPending ? 'Menghapus...' : `Hapus Semua Pending (${pendingCount})`}
+    </button>
+  )
+}
+
 export function CampaignContactList({ campaignId, campaignContacts }: Props) {
   const pendingCount = campaignContacts.filter(c => c.status === 'pending').length
 
@@ -47,17 +110,7 @@ export function CampaignContactList({ campaignId, campaignContacts }: Props) {
     <div>
       {pendingCount > 0 && (
         <div className="flex justify-end mb-3">
-          <form action={async () => {
-            'use server'
-            await removePendingContacts(campaignId)
-          }}>
-            <button
-              type="submit"
-              className="text-[12px] text-red-500 hover:text-red-700 transition-colors"
-            >
-              Hapus Semua Pending ({pendingCount})
-            </button>
-          </form>
+          <RemoveAllPendingButton campaignId={campaignId} pendingCount={pendingCount} />
         </div>
       )}
       <div className="overflow-hidden rounded-xl border border-[#e8e8e6]">
@@ -89,24 +142,10 @@ export function CampaignContactList({ campaignId, campaignContacts }: Props) {
                 </td>
                 <td className="px-4 py-3 text-right">
                   {cc.status === 'pending' && (
-                    <form action={async () => {
-                      'use server'
-                      await removeContactFromCampaign(cc.id, campaignId)
-                    }}>
-                      <button type="submit" className="text-[13px] text-[#a0a0a0] hover:text-red-500 transition-colors font-medium">
-                        Hapus
-                      </button>
-                    </form>
+                    <RemoveContactButton ccId={cc.id} campaignId={campaignId} />
                   )}
                   {cc.status === 'failed' && (
-                    <form action={async () => {
-                      'use server'
-                      await retryContactBroadcast(cc.id, campaignId)
-                    }}>
-                      <button type="submit" className="text-[13px] text-[#a0a0a0] hover:text-blue-500 transition-colors font-medium">
-                        Retry
-                      </button>
-                    </form>
+                    <RetryContactButton ccId={cc.id} campaignId={campaignId} />
                   )}
                 </td>
               </tr>

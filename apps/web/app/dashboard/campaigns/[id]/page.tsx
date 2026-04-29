@@ -1,7 +1,6 @@
 import { createAdminClient } from '@/lib/supabase/admin'
-import { pauseCampaign, resumeCampaign } from '../actions'
 import { SendControls } from './send-controls'
-import { Button } from '@/components/ui/button'
+import { PauseCampaignButton, ResumeCampaignButton } from './campaign-status-buttons'
 import { notFound } from 'next/navigation'
 import { EditMessageForm } from './edit-message-form'
 import { DeleteCampaignButton } from '../delete-campaign-button'
@@ -80,16 +79,8 @@ export default async function CampaignDetailPage({
           {(campaign.status === 'draft' || campaign.status === 'scheduled') && (
             <SendControls campaignId={id} />
           )}
-          {campaign.status === 'running' && (
-            <form action={async () => { 'use server'; await pauseCampaign(id) }}>
-              <Button variant="outline" type="submit">Pause</Button>
-            </form>
-          )}
-          {campaign.status === 'paused' && (
-            <form action={async () => { 'use server'; await resumeCampaign(id) }}>
-              <Button type="submit">Lanjutkan</Button>
-            </form>
-          )}
+          {campaign.status === 'running' && <PauseCampaignButton campaignId={id} />}
+          {campaign.status === 'paused' && <ResumeCampaignButton campaignId={id} />}
           <DeleteCampaignButton campaignId={id} campaignName={campaign.name} variant="button" />
         </div>
       </div>

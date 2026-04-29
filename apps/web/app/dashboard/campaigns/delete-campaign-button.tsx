@@ -84,8 +84,14 @@ export function DeleteCampaignButton({ campaignId, campaignName, variant = 'icon
                 type="button"
                 onClick={handleConfirm}
                 disabled={loading}
-                className="flex-1 h-9 rounded-lg bg-red-500 text-white text-[13px] font-medium hover:bg-red-600 transition-colors disabled:opacity-50"
+                className="flex-1 h-9 rounded-lg bg-red-500 text-white text-[13px] font-medium hover:bg-red-600 transition-colors disabled:opacity-50 inline-flex items-center justify-center gap-1.5"
               >
+                {loading && (
+                  <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                  </svg>
+                )}
                 {loading ? 'Menghapus...' : 'Ya, Hapus'}
               </button>
             </div>
