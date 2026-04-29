@@ -84,7 +84,7 @@ export default async function CampaignsPage() {
                 </td>
                 <td className="px-4 py-3 text-right">
                   <div className="flex items-center justify-end gap-3">
-                    <Link href={`/dashboard/campaigns/${campaign.id}`} className="text-[13px] font-medium text-[#111111] hover:text-[#25D366] transition-colors">
+                    <Link href={`/dashboard/campaigns/${campaign.id}`} className="inline-flex items-center gap-1 h-7 px-3 rounded-lg bg-[#111111] text-white text-[12px] font-medium hover:bg-[#2a2a2a] transition-colors">
                       Detail →
                     </Link>
                     <DeleteCampaignButton campaignId={campaign.id} campaignName={campaign.name} />
