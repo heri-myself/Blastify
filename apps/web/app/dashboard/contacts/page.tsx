@@ -3,6 +3,7 @@ import { getUserRole } from '@/lib/get-user-role'
 import { ImportForm } from './import-form'
 import { AddContactForm } from './add-contact-form'
 import { ContactFilters } from './contact-filters'
+import { TagBadge } from '@/components/tag-badge'
 import { deleteContact } from './actions'
 import { CsvImportWarning } from '@/components/csv-import-warning'
 
@@ -109,9 +110,7 @@ export default async function ContactsPage({ searchParams }: Props) {
                 <td className="px-4 py-3">
                   <div className="flex gap-1 flex-wrap">
                     {contact.tags?.map((tag: string) => (
-                      <span key={tag} className="text-[11px] px-2 py-0.5 rounded-full bg-[#f2f2f0] text-[#7a7a7a] font-medium">
-                        {tag}
-                      </span>
+                      <TagBadge key={tag} tag={tag} />
                     ))}
                   </div>
                 </td>

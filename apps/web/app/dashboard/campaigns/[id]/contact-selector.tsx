@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { addContactsToCampaign } from './contact-actions'
+import { TagBadge } from '@/components/tag-badge'
 
 interface Contact {
   id: string
@@ -184,9 +185,7 @@ export function ContactSelector({ campaignId, contacts, existingContactIds, allT
                   <td className="px-4 py-3">
                     <div className="flex gap-1 flex-wrap">
                       {c.tags?.map(tag => (
-                        <span key={tag} className="text-[11px] px-2 py-0.5 rounded-full bg-[#f2f2f0] text-[#7a7a7a] font-medium">
-                          {tag}
-                        </span>
+                        <TagBadge key={tag} tag={tag} />
                       ))}
                     </div>
                   </td>
