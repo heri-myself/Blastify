@@ -1,7 +1,26 @@
 import { createWAConnection, type WASocket } from './connect'
 import { supabase } from '../supabase'
+import { existsSync } from 'fs'
+import { join } from 'path'
+import { rmSync } from 'fs'
 
-const MAX_RECONNECT_ATTEMPTS = 5
+const AUTH_DIR = process.env.AUTH_DIR ?? join(process.cwd(), 'auth_sessions')
+
+function hasAuthFile(senderId: string): boolean {
+  return existsSync(join(AUTH_DIR, senderId, 'creds.json'))
+}
+
+function deleteAuthFiles(senderId: string): void {
+  const path = join(AUTH_DIR, senderId)
+  try {
+    rmSync(path, { recursive: true, force: true })
+  } catch {}
+}
+
+// Exponential backoff: 5s, 10s, 20s, 40s, 80s, 160s, cap at 300s
+function reconnectDelay(attempts: number): number {
+  return Math.min(5_000 * Math.pow(2, attempts - 1), 300_000)
+}
 
 interface Session {
   sock: WASocket
@@ -15,10 +34,15 @@ const sessions = new Map<string, Session>()
 const reconnectTimers = new Map<string, NodeJS.Timeout>()
 
 export async function initAllSessions(): Promise<void> {
+  // Reset sender yang ter-disable karena bug reconnect, agar bisa diinit ulang
+  await supabase
+    .from('sender_phones')
+    .update({ status: 'warmup', session_data: { connected: false } })
+    .eq('status', 'disabled')
+
   const { data: senders } = await supabase
     .from('sender_phones')
     .select('id, phone_number, status')
-    .neq('status', 'disabled')
 
   if (!senders?.length) {
     console.log('[session-manager] Tidak ada sender yang perlu diinisialisasi')
@@ -32,7 +56,6 @@ export async function initAllSessions(): Promise<void> {
 
 export async function initSession(senderId: string): Promise<void> {
   const existing = sessions.get(senderId)
-  // Skip if session exists and is not in reconnecting state
   if (existing && !existing.reconnecting) return
 
   const reconnectAttempts = existing?.reconnectAttempts ?? 0
@@ -59,33 +82,43 @@ export async function initSession(senderId: string): Promise<void> {
         .update({ session_data: { qr: null, connected: true }, status: 'active' })
         .eq('id', senderId)
       if (readyErr) console.error(`[session-manager] Gagal update connected=true untuk ${senderId}:`, readyErr.message)
+      else console.log(`[session-manager] Sender ${senderId} terhubung dan aktif`)
     },
     async (shouldReconnect) => {
       const session = sessions.get(senderId)
       const attempts = (session?.reconnectAttempts ?? 0) + 1
 
-      if (!shouldReconnect || attempts > MAX_RECONNECT_ATTEMPTS) {
-        console.log(`[session-manager] Sender ${senderId} disconnect permanen (attempts: ${attempts})`)
+      if (!shouldReconnect) {
+        // Reason 401: WhatsApp aktif logout session ini (bukan sekadar koneksi putus)
+        console.log(`[session-manager] Sender ${senderId} di-logout WhatsApp, hapus auth dan minta scan ulang`)
         sessions.delete(senderId)
+        deleteAuthFiles(senderId)
         await supabase
           .from('sender_phones')
-          .update({ status: 'disabled', session_data: { connected: false } })
+          .update({ status: 'warmup', session_data: { connected: false, qr: null } })
           .eq('id', senderId)
+        // Reconnect untuk generate QR baru
+        const timer = setTimeout(() => initSession(senderId), 5_000)
+        reconnectTimers.set(senderId, timer)
         return
       }
 
-      // Mark as reconnecting so syncNewSenders doesn't re-init
+      // shouldReconnect = true: koneksi putus (408, network, dll) — SELALU reconnect tanpa batas
       if (session) {
         session.ready = false
         session.reconnecting = true
         session.reconnectAttempts = attempts
       } else {
-        // Session was somehow removed, re-add placeholder
         sessions.set(senderId, { sock, senderId, ready: false, reconnecting: true, reconnectAttempts: attempts })
       }
 
-      const delay = 5_000 + Math.random() * 10_000
-      console.log(`[session-manager] Reconnect sender ${senderId} dalam ${Math.round(delay / 1000)}s (attempt ${attempts}/${MAX_RECONNECT_ATTEMPTS})`)
+      await supabase
+        .from('sender_phones')
+        .update({ session_data: { connected: false } })
+        .eq('id', senderId)
+
+      const delay = reconnectDelay(attempts)
+      console.log(`[session-manager] Reconnect sender ${senderId} dalam ${Math.round(delay / 1000)}s (attempt ${attempts})`)
       const timer = setTimeout(() => initSession(senderId), delay)
       reconnectTimers.set(senderId, timer)
     }
@@ -115,7 +148,6 @@ export async function syncNewSenders(): Promise<void> {
 
   for (const sender of senders) {
     const session = sessions.get(sender.id)
-    // Only init if truly new (not in map at all, not reconnecting)
     if (!session) {
       console.log(`[session-manager] Sender baru ditemukan: ${sender.id}, init sesi...`)
       await initSession(sender.id)
