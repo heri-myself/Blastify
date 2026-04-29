@@ -84,7 +84,7 @@ export default async function CampaignDetailPage({
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      <div className="flex rounded-xl border border-[#e8e8e6] bg-white overflow-hidden shadow-sm mb-6">
         {[
           { label: 'Total Kontak', value: counts.total },
           { label: 'Pending', value: counts.pending },
@@ -92,11 +92,10 @@ export default async function CampaignDetailPage({
           { label: 'Gagal', value: counts.failed },
           { label: 'Dilewati', value: counts.skipped },
           { label: 'Success Rate', value: `${successRate}%` },
-        ].map(stat => (
-          <div key={stat.label} className="bg-white rounded-xl border border-[#e8e8e6] p-4 relative overflow-hidden">
-            <div className="absolute top-0 left-0 right-0 h-0.5 bg-[#25D366]" />
-            <p className="text-[12px] font-medium text-[#7a7a7a] uppercase tracking-wider">{stat.label}</p>
-            <p className="text-2xl font-bold text-[#111111] mt-1 tabular-nums">{stat.value}</p>
+        ].map((stat, i, arr) => (
+          <div key={stat.label} className={`flex flex-col justify-center px-5 py-3 flex-1 ${i < arr.length - 1 ? 'border-r border-[#e8e8e6]' : ''}`}>
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-[#b0b0b0] mb-1">{stat.label}</p>
+            <p className="text-lg font-bold tabular-nums text-[#111111] leading-none">{stat.value}</p>
           </div>
         ))}
       </div>
