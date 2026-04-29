@@ -54,10 +54,11 @@ export async function initSession(senderId: string): Promise<void> {
         session.reconnecting = false
         session.reconnectAttempts = 0
       }
-      await supabase
+      const { error: readyErr } = await supabase
         .from('sender_phones')
         .update({ session_data: { qr: null, connected: true }, status: 'active' })
         .eq('id', senderId)
+      if (readyErr) console.error(`[session-manager] Gagal update connected=true untuk ${senderId}:`, readyErr.message)
     },
     async (shouldReconnect) => {
       const session = sessions.get(senderId)

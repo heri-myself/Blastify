@@ -4,6 +4,7 @@ import { addSender } from './actions'
 import { QRButton } from './qr-button'
 import { AddSenderAdminForm } from './add-sender-admin-form'
 import { DeleteSenderButton } from './delete-sender-button'
+import { SendersAutoRefresh } from './senders-auto-refresh'
 
 const statusStyle: Record<string, string> = {
   active:      'bg-[#25D366] text-white shadow-sm',
@@ -43,6 +44,7 @@ export default async function SendersPage() {
 
   return (
     <div>
+      <SendersAutoRefresh />
       <div className="mb-6">
         <h1 className="text-xl font-semibold text-[#111111]">Sender WA</h1>
         <p className="text-[13px] text-[#7a7a7a] mt-0.5">
