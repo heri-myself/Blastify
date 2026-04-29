@@ -53,8 +53,8 @@ export default async function DashboardPage() {
   ] = await Promise.all([
     admin.from('contacts').select('*', { count: 'exact', head: true }).eq('user_id', userId),
     admin.from('campaigns').select('*', { count: 'exact', head: true }).eq('user_id', userId),
-    admin.from('campaign_contacts').select('*', { count: 'exact', head: true })
-      .eq('status', 'sent').gte('sent_at', today),
+    admin.from('campaign_contacts').select('*, campaigns!inner(user_id)', { count: 'exact', head: true })
+      .eq('campaigns.user_id', userId).eq('status', 'sent').gte('sent_at', today),
     admin.from('sender_phones').select('status').eq('user_id', userId),
   ])
   const activeSenders = senders?.filter(s => s.status === 'active').length ?? 0

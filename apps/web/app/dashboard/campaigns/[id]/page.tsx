@@ -36,14 +36,13 @@ export default async function CampaignDetailPage({
   const counts = {
     total: campaignContacts?.length ?? 0,
     pending: campaignContacts?.filter(s => s.status === 'pending').length ?? 0,
-    sent: campaignContacts?.filter(s => s.status === 'sent').length ?? 0,
-    delivered: campaignContacts?.filter(s => s.status === 'delivered').length ?? 0,
+    sent: campaignContacts?.filter(s => s.status === 'sent' || s.status === 'delivered').length ?? 0,
     failed: campaignContacts?.filter(s => s.status === 'failed').length ?? 0,
     skipped: campaignContacts?.filter(s => s.status === 'skipped').length ?? 0,
   }
 
   const successRate = counts.total > 0
-    ? Math.round((counts.delivered / counts.total) * 100)
+    ? Math.round((counts.sent / counts.total) * 100)
     : 0
 
   const existingContactIds = (campaignContacts ?? []).map(cc => cc.contact_id)
@@ -88,8 +87,8 @@ export default async function CampaignDetailPage({
       <div className="grid grid-cols-3 gap-4 mb-6">
         {[
           { label: 'Total Kontak', value: counts.total },
+          { label: 'Pending', value: counts.pending },
           { label: 'Terkirim', value: counts.sent },
-          { label: 'Delivered', value: counts.delivered },
           { label: 'Gagal', value: counts.failed },
           { label: 'Dilewati', value: counts.skipped },
           { label: 'Success Rate', value: `${successRate}%` },
