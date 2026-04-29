@@ -46,8 +46,24 @@ export async function deleteSender(id: string) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Unauthorized' }
-  const { error } = await supabase.from('sender_phones').delete().eq('id', id).eq('user_id', user.id)
+
+  // Pastikan sender milik user ini
+  const { data: sender } = await supabase.from('sender_phones').select('id').eq('id', id).eq('user_id', user.id).single()
+  if (!sender) return { error: 'Sender tidak ditemukan' }
+
+  const admin = createAdminClient()
+
+  // Ambil campaign_contact ids yang pakai sender ini
+  const { data: ccIds } = await admin.from('campaign_contacts').select('id').eq('sender_phone_id', id)
+  if (ccIds?.length) {
+    await admin.from('delivery_logs').delete().in('campaign_contact_id', ccIds.map(c => c.id))
+  }
+  // Null-kan referensi sender di campaign_contacts
+  await admin.from('campaign_contacts').update({ sender_phone_id: null }).eq('sender_phone_id', id)
+
+  const { error } = await admin.from('sender_phones').delete().eq('id', id)
   if (error) return { error: error.message }
+
   revalidatePath('/dashboard/senders')
   return { success: true }
 }

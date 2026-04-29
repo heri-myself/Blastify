@@ -6,11 +6,17 @@ import { deleteSender } from './actions'
 export function DeleteSenderButton({ senderId, phoneNumber }: { senderId: string; phoneNumber: string }) {
   const [open, setOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
+  const [error, setError] = useState<string | null>(null)
 
   function handleConfirm() {
+    setError(null)
     startTransition(async () => {
-      await deleteSender(senderId)
-      setOpen(false)
+      const result = await deleteSender(senderId)
+      if (result?.error) {
+        setError(result.error)
+      } else {
+        setOpen(false)
+      }
     })
   }
 
@@ -57,6 +63,7 @@ export function DeleteSenderButton({ senderId, phoneNumber }: { senderId: string
                 Nomor <span className="font-mono font-medium text-[#111111]">{phoneNumber}</span> akan dihapus permanen.
               </p>
               <p className="text-[12px] text-[#a0a0a0]">Sesi WhatsApp dan riwayat pengiriman akan ikut terhapus.</p>
+              {error && <p className="text-[12px] text-red-500 mt-2">{error}</p>}
             </div>
 
             <div className="px-6 pb-6 flex gap-2.5">
