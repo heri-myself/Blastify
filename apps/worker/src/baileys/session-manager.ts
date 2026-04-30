@@ -48,8 +48,9 @@ export async function initAllSessions(): Promise<void> {
     return
   }
 
-  for (const sender of senders) {
-    await initSession(sender.id)
+  for (let i = 0; i < senders.length; i++) {
+    await initSession(senders[i].id)
+    if (i < senders.length - 1) await new Promise(r => setTimeout(r, 3_000))
   }
 }
 
