@@ -58,12 +58,6 @@ export async function createWAConnection(
       const reason = (lastDisconnect?.error as Boom)?.output?.statusCode
       const shouldReconnect = reason !== DisconnectReason.loggedOut
       console.log(`[baileys] Sender ${senderId} disconnect (reason: ${reason}, reconnect: ${shouldReconnect})`)
-      if (!shouldReconnect) {
-        await supabase.from('sender_phones').update({
-          status: 'disabled',
-          session_data: { disconnected: true }
-        }).eq('id', senderId)
-      }
       onDisconnect(shouldReconnect)
     }
   })

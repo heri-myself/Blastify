@@ -33,19 +33,21 @@ export async function runCampaign(campaignId: string): Promise<void> {
     .eq('id', campaignId)
     .single()
 
-  let senderIds: string[] = (campaign?.sender_rotation as string[] | null) ?? []
+  const rotationIds: string[] = (campaign?.sender_rotation as string[] | null) ?? []
+  let totalSent = 0
 
-  if (senderIds.length === 0 && campaign?.user_id) {
+  async function resolveSenderIds(): Promise<string[]> {
+    if (rotationIds.length > 0) return rotationIds
+    if (!campaign?.user_id) return []
     const { data: allSenders } = await supabase
       .from('sender_phones')
       .select('id')
       .eq('user_id', campaign.user_id)
       .in('status', ['active', 'warmup', 'recovering'])
-    senderIds = allSenders?.map(s => s.id) ?? []
-    console.log(`[batch] sender_rotation kosong, menggunakan ${senderIds.length} sender aktif milik user`)
+    const ids = allSenders?.map(s => s.id) ?? []
+    console.log(`[batch] sender_rotation kosong, menggunakan ${ids.length} sender aktif milik user`)
+    return ids
   }
-
-  let totalSent = 0
 
   while (true) {
     const { data: currentCampaign } = await supabase
@@ -75,10 +77,12 @@ export async function runCampaign(campaignId: string): Promise<void> {
       return
     }
 
+    // Re-resolve sender IDs every loop to pick up newly connected senders
+    const senderIds = await resolveSenderIds()
     const sender = await pickBestSender(senderIds)
     if (!sender) {
-      console.log(`[batch] Tidak ada sender tersedia untuk campaign ${campaignId}, tunggu 5 menit`)
-      await new Promise(r => setTimeout(r, 5 * 60 * 1000))
+      console.log(`[batch] Tidak ada sender tersedia untuk campaign ${campaignId}, tunggu 2 menit`)
+      await new Promise(r => setTimeout(r, 2 * 60 * 1000))
       continue
     }
 
