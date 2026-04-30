@@ -4,8 +4,8 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
 
-const QR_TTL = 60        // detik sebelum anggap expired (WA expire ~60s)
-const POLL_INTERVAL = 3  // detik interval polling saat QR null
+const QR_TTL = 60        // detik countdown UI
+const POLL_INTERVAL = 3  // detik interval polling
 
 export function QRButton({ senderId }: { senderId: string }) {
   const [open, setOpen] = useState(false)
@@ -14,6 +14,8 @@ export function QRButton({ senderId }: { senderId: string }) {
   const [countdown, setCountdown] = useState(0)
 
   const countdownRef = useRef<NodeJS.Timeout | null>(null)
+  // Ref untuk QR saat ini agar fetchQR bisa membandingkan tanpa deps
+  const currentQrRef = useRef<string | null>(null)
 
   function stopCountdown() {
     if (countdownRef.current) {
@@ -32,7 +34,6 @@ export function QRButton({ senderId }: { senderId: string }) {
         if (prev <= 1) {
           clearInterval(countdownRef.current!)
           countdownRef.current = null
-          setQr(null)   // trigger polling effect to restart
           return 0
         }
         return prev - 1
@@ -48,31 +49,37 @@ export function QRButton({ senderId }: { senderId: string }) {
       if (data.connected) {
         setConnected(true)
         setQr(null)
+        currentQrRef.current = null
         stopCountdown()
         return
       }
 
       if (data.qr) {
-        setQr(data.qr)
-        startCountdown()
+        // Hanya reset countdown jika QR benar-benar baru
+        if (data.qr !== currentQrRef.current) {
+          currentQrRef.current = data.qr
+          setQr(data.qr)
+          startCountdown()
+        }
       }
     } catch {}
   }, [senderId, startCountdown])
 
-  // Satu-satunya polling effect. Berjalan saat panel terbuka dan QR null.
-  // Cleanup effect React (clearInterval) dipanggil otomatis saat qr berubah ke non-null
-  // sehingga interval berhenti dengan benar tanpa perlu ref global.
+  // Selalu polling saat panel terbuka — baik saat QR null maupun sudah tampil.
+  // Ini penting karena WhatsApp mengganti QR setiap ~20 detik.
+  // fetchQR hanya update UI jika QR berubah, sehingga countdown tidak direset sia-sia.
   useEffect(() => {
-    if (!open || connected || qr) return
+    if (!open || connected) return
 
     fetchQR()
     const id = setInterval(fetchQR, POLL_INTERVAL * 1000)
     return () => clearInterval(id)
-  }, [open, qr, connected, fetchQR])
+  }, [open, connected, fetchQR])
 
   function handleOpen() {
     setOpen(true)
     setQr(null)
+    currentQrRef.current = null
     setCountdown(0)
     setConnected(false)
     stopCountdown()
@@ -82,6 +89,7 @@ export function QRButton({ senderId }: { senderId: string }) {
     setOpen(false)
     stopCountdown()
     setQr(null)
+    currentQrRef.current = null
     setCountdown(0)
   }
 
