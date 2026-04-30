@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
 
-const QR_TTL = 55        // detik sebelum anggap expired (WA expire ~60s)
+const QR_TTL = 60        // detik sebelum anggap expired (WA expire ~60s)
 const POLL_INTERVAL = 3  // detik interval polling saat QR null
 
 export function QRButton({ senderId }: { senderId: string }) {
@@ -12,20 +12,17 @@ export function QRButton({ senderId }: { senderId: string }) {
   const [qr, setQr] = useState<string | null>(null)
   const [connected, setConnected] = useState(false)
   const [countdown, setCountdown] = useState(0)
-  const [polling, setPolling] = useState(false)
 
   const countdownRef = useRef<NodeJS.Timeout | null>(null)
-  const pollRef = useRef<NodeJS.Timeout | null>(null)
 
-  const stopCountdown = () => {
-    if (countdownRef.current) clearInterval(countdownRef.current)
-  }
-  const stopPoll = () => {
-    if (pollRef.current) clearInterval(pollRef.current)
-    setPolling(false)
+  function stopCountdown() {
+    if (countdownRef.current) {
+      clearInterval(countdownRef.current)
+      countdownRef.current = null
+    }
   }
 
-  useEffect(() => () => { stopCountdown(); stopPoll() }, [])
+  useEffect(() => () => { stopCountdown() }, [])
 
   const startCountdown = useCallback(() => {
     stopCountdown()
@@ -34,8 +31,8 @@ export function QRButton({ senderId }: { senderId: string }) {
       setCountdown(prev => {
         if (prev <= 1) {
           clearInterval(countdownRef.current!)
-          // QR expired — langsung fetch ulang otomatis
-          setQr(null)
+          countdownRef.current = null
+          setQr(null)   // trigger polling effect to restart
           return 0
         }
         return prev - 1
@@ -51,52 +48,38 @@ export function QRButton({ senderId }: { senderId: string }) {
       if (data.connected) {
         setConnected(true)
         setQr(null)
-        stopPoll()
         stopCountdown()
         return
       }
 
       if (data.qr) {
         setQr(data.qr)
-        stopPoll()
-        setPolling(false)
         startCountdown()
       }
-      // Jika qr masih null, polling lanjut
     } catch {}
   }, [senderId, startCountdown])
 
-  // Auto-fetch ulang saat QR null dan panel terbuka
+  // Satu-satunya polling effect. Berjalan saat panel terbuka dan QR null.
+  // Cleanup effect React (clearInterval) dipanggil otomatis saat qr berubah ke non-null
+  // sehingga interval berhenti dengan benar tanpa perlu ref global.
   useEffect(() => {
-    if (!open || connected) return
-    if (qr) return // Sudah ada QR, tidak perlu poll
+    if (!open || connected || qr) return
 
-    setPolling(true)
-    fetchQR() // fetch langsung
-    pollRef.current = setInterval(fetchQR, POLL_INTERVAL * 1000)
-    return () => stopPoll()
+    fetchQR()
+    const id = setInterval(fetchQR, POLL_INTERVAL * 1000)
+    return () => clearInterval(id)
   }, [open, qr, connected, fetchQR])
-
-  // Saat QR expire (countdown = 0), mulai poll lagi
-  useEffect(() => {
-    if (open && countdown === 0 && !qr && !connected) {
-      setPolling(true)
-      fetchQR()
-      pollRef.current = setInterval(fetchQR, POLL_INTERVAL * 1000)
-      return () => stopPoll()
-    }
-  }, [countdown, open, qr, connected, fetchQR])
 
   function handleOpen() {
     setOpen(true)
     setQr(null)
     setCountdown(0)
     setConnected(false)
+    stopCountdown()
   }
 
   function handleClose() {
     setOpen(false)
-    stopPoll()
     stopCountdown()
     setQr(null)
     setCountdown(0)
