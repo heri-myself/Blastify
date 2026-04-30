@@ -82,6 +82,7 @@ export async function runCampaign(campaignId: string): Promise<void> {
       continue
     }
 
+    let sessionNotReady = false
     for (const item of batch) {
       if (totalSent > 0 && totalSent % 20 === 0) {
         const shouldStop = await checkCampaignErrorRate(campaignId)
@@ -112,10 +113,13 @@ export async function runCampaign(campaignId: string): Promise<void> {
       if (result.success) totalSent++
 
       if (!result.success && result.errorCode === 'SESSION_NOT_READY') {
+        console.log(`[batch] Sender ${sender.id} SESSION_NOT_READY, tunggu 15s lalu retry`)
+        await new Promise(r => setTimeout(r, 15_000))
+        sessionNotReady = true
         break
       }
     }
 
-    await batchRest()
+    if (!sessionNotReady) await batchRest()
   }
 }

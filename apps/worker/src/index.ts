@@ -13,6 +13,14 @@ async function resetStuckCampaigns() {
     console.log(`[Worker] Reset ${data.length} campaign stuck 'running' → 'scheduled':`, data.map(c => c.name))
   }
   if (error) console.error('[Worker] Gagal reset stuck campaigns:', error.message)
+
+  // Reset contacts stuck in 'sending' back to 'pending' (worker crashed mid-send)
+  const { count } = await supabase
+    .from('campaign_contacts')
+    .update({ status: 'pending', sender_phone_id: null })
+    .eq('status', 'sending')
+    .select('id', { count: 'exact', head: true })
+  if (count) console.log(`[Worker] Reset ${count} kontak stuck 'sending' → 'pending'`)
 }
 
 async function main() {
