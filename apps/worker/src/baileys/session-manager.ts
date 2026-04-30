@@ -109,7 +109,6 @@ export async function initSession(senderId: string): Promise<void> {
       }
 
       // shouldReconnect = true: koneksi putus (408, network, dll)
-      // PENTING: sertakan lastQr agar QR tidak hilang dari DB saat disconnect
       if (session) {
         session.ready = false
         session.reconnecting = true
@@ -118,11 +117,14 @@ export async function initSession(senderId: string): Promise<void> {
         sessions.set(senderId, { sock, senderId, ready: false, reconnecting: true, reconnectAttempts: attempts, lastQr: lastQr ?? undefined })
       }
 
-      // Update connected: false tapi PERTAHANKAN qr terakhir di DB
-      await supabase
-        .from('sender_phones')
-        .update({ session_data: { connected: false, qr: lastQr } })
-        .eq('id', senderId)
+      // Kalau creds.json masih ada, reconnect otomatis tanpa scan ulang — jangan ubah DB
+      // supaya UI tidak flicker ke "Scan QR" sementara
+      if (!hasAuthFile(senderId)) {
+        await supabase
+          .from('sender_phones')
+          .update({ session_data: { connected: false, qr: lastQr } })
+          .eq('id', senderId)
+      }
 
       const delay = reconnectDelay(attempts)
       console.log(`[session-manager] Reconnect sender ${senderId} dalam ${Math.round(delay / 1000)}s (attempt ${attempts})`)
