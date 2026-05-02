@@ -29,8 +29,8 @@ export default async function DashboardPage() {
     return (
       <div>
         <div className="mb-4">
-          <h1 className="text-xl font-semibold text-[#111111]">Overview</h1>
-          <p className="text-[13px] text-[#7a7a7a] mt-0.5">Ringkasan seluruh aktivitas platform</p>
+          <h1 className="text-xl font-semibold text-foreground">Overview</h1>
+          <p className="text-[13px] text-muted-foreground mt-0.5">Ringkasan seluruh aktivitas platform</p>
         </div>
         <WorkerStatusBar />
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -62,8 +62,8 @@ export default async function DashboardPage() {
   return (
     <div>
       <div className="mb-4">
-        <h1 className="text-xl font-semibold text-[#111111]">Overview</h1>
-        <p className="text-[13px] text-[#7a7a7a] mt-0.5">Ringkasan aktivitas broadcast Anda</p>
+        <h1 className="text-xl font-semibold text-foreground">Overview</h1>
+        <p className="text-[13px] text-muted-foreground mt-0.5">Ringkasan aktivitas broadcast Anda</p>
       </div>
       <WorkerStatusBar />
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">

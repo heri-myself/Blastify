@@ -8,10 +8,10 @@ import { SendersAutoRefresh } from './senders-auto-refresh'
 
 const statusStyle: Record<string, string> = {
   active:      'bg-[#25D366] text-white shadow-sm',
-  warmup:      'bg-amber-50 text-amber-600',
-  soft_banned: 'bg-red-50 text-red-500',
-  recovering:  'bg-orange-50 text-orange-500',
-  disabled:    'bg-[#f2f2f0] text-[#7a7a7a]',
+  warmup:      'bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400',
+  soft_banned: 'bg-red-50 text-red-500 dark:bg-red-950/40 dark:text-red-400',
+  recovering:  'bg-orange-50 text-orange-500 dark:bg-orange-950/40 dark:text-orange-400',
+  disabled:    'bg-secondary text-muted-foreground',
 }
 
 const statusLabel: Record<string, string> = {
@@ -46,8 +46,8 @@ export default async function SendersPage() {
     <div>
       <SendersAutoRefresh />
       <div className="mb-6">
-        <h1 className="text-xl font-semibold text-[#111111]">Sender WA</h1>
-        <p className="text-[13px] text-[#7a7a7a] mt-0.5">
+        <h1 className="text-xl font-semibold text-foreground">Sender WA</h1>
+        <p className="text-[13px] text-muted-foreground mt-0.5">
           {isSuperadmin
             ? `Semua nomor sender dari seluruh user — ${senders?.length ?? 0} nomor`
             : 'Kelola nomor WhatsApp untuk broadcast'}
@@ -57,55 +57,55 @@ export default async function SendersPage() {
       {isSuperadmin && <AddSenderAdminForm users={userList} />}
 
       {!isSuperadmin && (
-        <div className="bg-white rounded-xl border border-[#e8e8e6] p-5 mb-5">
-          <p className="text-[13px] font-medium text-[#111111] mb-3">Tambah Nomor Sender</p>
+        <div className="bg-card rounded-xl border border-border p-5 mb-5">
+          <p className="text-[13px] font-medium text-foreground mb-3">Tambah Nomor Sender</p>
           <form action={addSender as (formData: FormData) => void} className="flex gap-2.5 flex-wrap">
             <input
               name="phone_number"
               placeholder="628xxxxxxxxxx"
               required
-              className="h-9 px-3 rounded-lg border border-[#e8e8e6] bg-[#f8f8f7] text-[13px] font-mono placeholder:text-[#b0b0b0] outline-none focus:border-[#111111] transition-colors w-52"
+              className="h-9 px-3 rounded-lg border border-border bg-background text-[13px] font-mono placeholder:text-muted-foreground outline-none focus:border-accent transition-colors w-52"
             />
             <input
               name="display_name"
               placeholder="Nama (opsional)"
-              className="h-9 px-3 rounded-lg border border-[#e8e8e6] bg-[#f8f8f7] text-[13px] placeholder:text-[#b0b0b0] outline-none focus:border-[#111111] transition-colors w-48"
+              className="h-9 px-3 rounded-lg border border-border bg-background text-[13px] placeholder:text-muted-foreground outline-none focus:border-accent transition-colors w-48"
             />
-            <button type="submit" className="h-9 px-4 rounded-lg bg-[#111111] text-white text-[13px] font-medium hover:bg-[#2a2a2a] transition-colors">
+            <button type="submit" className="h-9 px-4 rounded-lg bg-foreground text-background text-[13px] font-medium hover:opacity-90 transition-opacity">
               Tambah
             </button>
           </form>
-          <p className="text-[12px] text-[#a0a0a0] mt-2">
+          <p className="text-[12px] text-muted-foreground mt-2">
             Format: 628xxxxxxxxxx · Nomor baru otomatis masuk mode warm-up.
           </p>
         </div>
       )}
 
-      <div className="bg-white rounded-xl border border-[#e8e8e6] overflow-hidden">
+      <div className="bg-card rounded-xl border border-border overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-[#e8e8e6]">
-              {isSuperadmin && <th className="text-left px-4 py-3 text-[12px] font-medium text-[#7a7a7a] uppercase tracking-wider">User</th>}
-              <th className="text-left px-4 py-3 text-[12px] font-medium text-[#7a7a7a] uppercase tracking-wider">Nomor</th>
-              <th className="text-left px-4 py-3 text-[12px] font-medium text-[#7a7a7a] uppercase tracking-wider">Nama</th>
-              <th className="text-left px-4 py-3 text-[12px] font-medium text-[#7a7a7a] uppercase tracking-wider">Status</th>
-              <th className="text-left px-4 py-3 text-[12px] font-medium text-[#7a7a7a] uppercase tracking-wider">WA</th>
-              <th className="text-left px-4 py-3 text-[12px] font-medium text-[#7a7a7a] uppercase tracking-wider">Warmup</th>
-              <th className="text-left px-4 py-3 text-[12px] font-medium text-[#7a7a7a] uppercase tracking-wider">Terkirim</th>
-              <th className="text-left px-4 py-3 text-[12px] font-medium text-[#7a7a7a] uppercase tracking-wider">Pulih Pada</th>
+            <tr className="border-b border-border">
+              {isSuperadmin && <th className="text-left px-4 py-3 text-[12px] font-medium text-muted-foreground uppercase tracking-wider">User</th>}
+              <th className="text-left px-4 py-3 text-[12px] font-medium text-muted-foreground uppercase tracking-wider">Nomor</th>
+              <th className="text-left px-4 py-3 text-[12px] font-medium text-muted-foreground uppercase tracking-wider">Nama</th>
+              <th className="text-left px-4 py-3 text-[12px] font-medium text-muted-foreground uppercase tracking-wider">Status</th>
+              <th className="text-left px-4 py-3 text-[12px] font-medium text-muted-foreground uppercase tracking-wider">WA</th>
+              <th className="text-left px-4 py-3 text-[12px] font-medium text-muted-foreground uppercase tracking-wider">Warmup</th>
+              <th className="text-left px-4 py-3 text-[12px] font-medium text-muted-foreground uppercase tracking-wider">Terkirim</th>
+              <th className="text-left px-4 py-3 text-[12px] font-medium text-muted-foreground uppercase tracking-wider">Pulih Pada</th>
               {!isSuperadmin && <th className="px-4 py-3" />}
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#f2f2f0]">
+          <tbody className="divide-y divide-border">
             {senders?.map((sender) => (
-              <tr key={sender.id} className="hover:bg-[#f8f8f7] transition-colors">
+              <tr key={sender.id} className="hover:bg-secondary/50 transition-colors">
                 {isSuperadmin && (
-                  <td className="px-4 py-3 text-[13px] text-[#7a7a7a]">
+                  <td className="px-4 py-3 text-[13px] text-muted-foreground">
                     {emailMap[sender.user_id] ?? sender.user_id.slice(0, 8)}
                   </td>
                 )}
-                <td className="px-4 py-3 font-mono text-[13px] text-[#111111]">{sender.phone_number}</td>
-                <td className="px-4 py-3 text-[13px] text-[#111111]">{sender.display_name ?? '—'}</td>
+                <td className="px-4 py-3 font-mono text-[13px] text-foreground">{sender.phone_number}</td>
+                <td className="px-4 py-3 text-[13px] text-foreground">{sender.display_name ?? '—'}</td>
                 <td className="px-4 py-3">
                   {sender.status === 'active' ? (
                     <span className={`inline-flex items-center gap-1.5 text-[12px] px-2.5 py-1 rounded-full font-medium ${statusStyle.active}`}>
@@ -133,12 +133,12 @@ export default async function SendersPage() {
                   ) : (sender.session_data as any)?.qr ? (
                     <span className="text-[12px] font-medium text-amber-500">Scan QR</span>
                   ) : (
-                    <span className="text-[12px] text-[#a0a0a0]">Offline</span>
+                    <span className="text-[12px] text-muted-foreground">Offline</span>
                   )}
                 </td>
-                <td className="px-4 py-3 text-[13px] text-[#7a7a7a]">{sender.warmup_day}/14</td>
-                <td className="px-4 py-3 text-[13px] text-[#7a7a7a]">{sender.daily_sent}</td>
-                <td className="px-4 py-3 text-[13px] text-[#7a7a7a] font-mono">
+                <td className="px-4 py-3 text-[13px] text-muted-foreground">{sender.warmup_day}/14</td>
+                <td className="px-4 py-3 text-[13px] text-muted-foreground">{sender.daily_sent}</td>
+                <td className="px-4 py-3 text-[13px] text-muted-foreground font-mono">
                   {sender.recover_at ? new Date(sender.recover_at).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' }) : '—'}
                 </td>
                 {!isSuperadmin && (
@@ -153,7 +153,7 @@ export default async function SendersPage() {
             ))}
             {!senders?.length && (
               <tr>
-                <td colSpan={isSuperadmin ? 8 : 9} className="px-4 py-12 text-center text-[#a0a0a0] text-[13px]">
+                <td colSpan={isSuperadmin ? 8 : 9} className="px-4 py-12 text-center text-muted-foreground text-[13px]">
                   Belum ada nomor sender.
                 </td>
               </tr>

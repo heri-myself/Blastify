@@ -72,11 +72,11 @@ export default async function ContactsPage({ searchParams }: Props) {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-xl font-semibold text-[#111111]">Kontak</h1>
-          <p className="text-[13px] text-[#7a7a7a] mt-0.5">
-            Format CSV: kolom <code className="bg-[#f2f2f0] px-1 py-0.5 rounded text-[12px]">phone</code>,{' '}
-            <code className="bg-[#f2f2f0] px-1 py-0.5 rounded text-[12px]">name</code>,{' '}
-            <code className="bg-[#f2f2f0] px-1 py-0.5 rounded text-[12px]">tags</code>
+          <h1 className="text-xl font-semibold text-foreground">Kontak</h1>
+          <p className="text-[13px] text-muted-foreground mt-0.5">
+            Format CSV: kolom <code className="bg-secondary px-1 py-0.5 rounded text-[12px]">phone</code>,{' '}
+            <code className="bg-secondary px-1 py-0.5 rounded text-[12px]">name</code>,{' '}
+            <code className="bg-secondary px-1 py-0.5 rounded text-[12px]">tags</code>
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -88,25 +88,25 @@ export default async function ContactsPage({ searchParams }: Props) {
       <CsvImportWarning />
       <ContactFilters isSuperadmin={isSuperadmin} users={users} allTags={allTags} />
 
-      <div className="bg-white rounded-xl border border-[#e8e8e6] overflow-hidden">
+      <div className="bg-card rounded-xl border border-border overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-[#e8e8e6]">
-              <th className="text-left px-4 py-3 text-[12px] font-medium text-[#7a7a7a] uppercase tracking-wider">Nomor</th>
-              <th className="text-left px-4 py-3 text-[12px] font-medium text-[#7a7a7a] uppercase tracking-wider">Nama</th>
-              <th className="text-left px-4 py-3 text-[12px] font-medium text-[#7a7a7a] uppercase tracking-wider">Tags</th>
-              <th className="text-left px-4 py-3 text-[12px] font-medium text-[#7a7a7a] uppercase tracking-wider">Status</th>
+            <tr className="border-b border-border">
+              <th className="text-left px-4 py-3 text-[12px] font-medium text-muted-foreground uppercase tracking-wider">Nomor</th>
+              <th className="text-left px-4 py-3 text-[12px] font-medium text-muted-foreground uppercase tracking-wider">Nama</th>
+              <th className="text-left px-4 py-3 text-[12px] font-medium text-muted-foreground uppercase tracking-wider">Tags</th>
+              <th className="text-left px-4 py-3 text-[12px] font-medium text-muted-foreground uppercase tracking-wider">Status</th>
               {isSuperadmin && (
-                <th className="text-left px-4 py-3 text-[12px] font-medium text-[#7a7a7a] uppercase tracking-wider">User</th>
+                <th className="text-left px-4 py-3 text-[12px] font-medium text-muted-foreground uppercase tracking-wider">User</th>
               )}
               <th className="px-4 py-3" />
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#f2f2f0]">
+          <tbody className="divide-y divide-border">
             {contacts?.map((contact) => (
-              <tr key={contact.id} className="hover:bg-[#f8f8f7] transition-colors">
-                <td className="px-4 py-3 font-mono text-[13px] text-[#111111]">{contact.phone}</td>
-                <td className="px-4 py-3 text-[13px] text-[#111111]">{contact.name ?? '—'}</td>
+              <tr key={contact.id} className="hover:bg-secondary/50 transition-colors">
+                <td className="px-4 py-3 font-mono text-[13px] text-foreground">{contact.phone}</td>
+                <td className="px-4 py-3 text-[13px] text-foreground">{contact.name ?? '—'}</td>
                 <td className="px-4 py-3">
                   <div className="flex gap-1 flex-wrap">
                     {contact.tags?.map((tag: string) => (
@@ -117,16 +117,16 @@ export default async function ContactsPage({ searchParams }: Props) {
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-2">
                     {contact.is_blocked ? (
-                      <span className="text-[12px] px-2.5 py-1 rounded-full bg-red-50 text-red-500 font-medium">Blocked</span>
+                      <span className="text-[12px] px-2.5 py-1 rounded-full bg-red-50 text-red-500 dark:bg-red-950/40 dark:text-red-400 font-medium">Blocked</span>
                     ) : contact.opt_out_at ? (
-                      <span className="text-[12px] px-2.5 py-1 rounded-full bg-[#f2f2f0] text-[#7a7a7a] font-medium">Opt-out</span>
+                      <span className="text-[12px] px-2.5 py-1 rounded-full bg-secondary text-muted-foreground font-medium">Opt-out</span>
                     ) : (
-                      <span className="text-[12px] px-2.5 py-1 rounded-full bg-[#f0fdf4] text-[#25D366] font-medium">Aktif</span>
+                      <span className="text-[12px] px-2.5 py-1 rounded-full bg-[#f0fdf4] text-[#25D366] dark:bg-[#25D366]/10 font-medium">Aktif</span>
                     )}
                     {broadcastMap[contact.id] && (
                       <span
                         title={`Terakhir: ${broadcastMap[contact.id].campaignName} · ${broadcastMap[contact.id].status}`}
-                        className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#f0fdf4] text-[#25D366] cursor-default text-[11px] font-bold"
+                        className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#f0fdf4] text-[#25D366] dark:bg-[#25D366]/10 cursor-default text-[11px] font-bold"
                       >
                         ✓
                       </span>
@@ -134,13 +134,13 @@ export default async function ContactsPage({ searchParams }: Props) {
                   </div>
                 </td>
                 {isSuperadmin && (
-                  <td className="px-4 py-3 text-[12px] text-[#7a7a7a] max-w-[160px] truncate">
+                  <td className="px-4 py-3 text-[12px] text-muted-foreground max-w-[160px] truncate">
                     {users.find(u => u.id === contact.user_id)?.email ?? contact.user_id?.slice(0, 8)}
                   </td>
                 )}
                 <td className="px-4 py-3 text-right">
                   <form action={async () => { 'use server'; await deleteContact(contact.id) }}>
-                    <button type="submit" className="text-[13px] text-[#a0a0a0] hover:text-red-500 transition-colors font-medium">
+                    <button type="submit" className="text-[13px] text-muted-foreground hover:text-destructive transition-colors font-medium">
                       Hapus
                     </button>
                   </form>
@@ -149,7 +149,7 @@ export default async function ContactsPage({ searchParams }: Props) {
             ))}
             {!contacts?.length && (
               <tr>
-                <td colSpan={isSuperadmin ? 6 : 5} className="px-4 py-12 text-center text-[#a0a0a0] text-[13px]">
+                <td colSpan={isSuperadmin ? 6 : 5} className="px-4 py-12 text-center text-muted-foreground text-[13px]">
                   {q || status || user || tag ? 'Tidak ada kontak yang cocok dengan filter.' : 'Belum ada kontak. Import CSV untuk memulai.'}
                 </td>
               </tr>
@@ -159,7 +159,7 @@ export default async function ContactsPage({ searchParams }: Props) {
       </div>
 
       {contacts && contacts.length > 0 && (
-        <p className="text-[12px] text-[#a0a0a0] mt-3 text-right">
+        <p className="text-[12px] text-muted-foreground mt-3 text-right">
           Menampilkan {contacts.length} kontak
         </p>
       )}
