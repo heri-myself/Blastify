@@ -7,7 +7,6 @@ import {
 } from '@whiskeysockets/baileys'
 import { Boom } from '@hapi/boom'
 import { join } from 'path'
-import { supabase } from '../supabase'
 import pino from 'pino'
 import QRCode from 'qrcode'
 
@@ -25,7 +24,15 @@ export async function createWAConnection(
 ): Promise<WASocket> {
   const authPath = join(AUTH_DIR, senderId)
   const { state, saveCreds } = await useMultiFileAuthState(authPath)
-  const { version } = await fetchLatestBaileysVersion()
+
+  let version: [number, number, number]
+  try {
+    const result = await fetchLatestBaileysVersion()
+    version = result.version
+  } catch {
+    version = [2, 3000, 1015901307]
+    console.warn(`[baileys] fetchLatestBaileysVersion gagal, pakai fallback version`)
+  }
 
   const sock = makeWASocket({
     version,
@@ -36,7 +43,10 @@ export async function createWAConnection(
     },
     printQRInTerminal: false,
     generateHighQualityLinkPreview: false,
-    keepAliveIntervalMs: 30_000,
+    keepAliveIntervalMs: 15_000,
+    connectTimeoutMs: 30_000,
+    defaultQueryTimeoutMs: 30_000,
+    retryRequestDelayMs: 500,
   })
 
   sock.ev.on('creds.update', saveCreds)

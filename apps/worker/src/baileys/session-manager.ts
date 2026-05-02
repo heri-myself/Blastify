@@ -49,7 +49,11 @@ export async function initAllSessions(): Promise<void> {
   }
 
   for (let i = 0; i < senders.length; i++) {
-    await initSession(senders[i].id)
+    try {
+      await initSession(senders[i].id)
+    } catch (err) {
+      console.error(`[session-manager] Gagal init sender ${senders[i].id}:`, err)
+    }
     if (i < senders.length - 1) await new Promise(r => setTimeout(r, 3_000))
   }
 }
@@ -58,14 +62,28 @@ export async function initSession(senderId: string): Promise<void> {
   const existing = sessions.get(senderId)
   if (existing && !existing.reconnecting) return
 
+  // Cancel any pending reconnect timer
+  const pendingTimer = reconnectTimers.get(senderId)
+  if (pendingTimer) {
+    clearTimeout(pendingTimer)
+    reconnectTimers.delete(senderId)
+  }
+
+  // Close old socket to prevent stale event callbacks from firing
+  if (existing?.sock) {
+    try { existing.sock.end(undefined) } catch {}
+  }
+
   const reconnectAttempts = existing?.reconnectAttempts ?? 0
   console.log(`[session-manager] Init sesi untuk sender ${senderId} (attempt ${reconnectAttempts + 1})`)
 
   const sock = await createWAConnection(
     senderId,
     async (qrDataUrl) => {
+      // Stale callback guard: ignore if this socket is no longer the active one
+      if (sessions.get(senderId)?.sock !== sock) return
+
       console.log(`[session-manager] QR untuk ${senderId}: (base64 image)`)
-      // Simpan QR di memory session
       const session = sessions.get(senderId)
       if (session) session.lastQr = qrDataUrl
 
@@ -75,6 +93,9 @@ export async function initSession(senderId: string): Promise<void> {
         .eq('id', senderId)
     },
     async () => {
+      // Stale callback guard
+      if (sessions.get(senderId)?.sock !== sock) return
+
       const session = sessions.get(senderId)
       if (session) {
         session.ready = true
@@ -90,6 +111,12 @@ export async function initSession(senderId: string): Promise<void> {
       else console.log(`[session-manager] Sender ${senderId} terhubung dan aktif`)
     },
     async (shouldReconnect) => {
+      // Stale callback guard: ignore disconnect from old socket that was already replaced
+      if (sessions.get(senderId)?.sock !== sock) {
+        console.log(`[session-manager] Stale disconnect ignored untuk ${senderId}`)
+        return
+      }
+
       const session = sessions.get(senderId)
       const attempts = (session?.reconnectAttempts ?? 0) + 1
       const lastQr = session?.lastQr ?? null
