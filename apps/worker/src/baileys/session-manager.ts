@@ -69,9 +69,17 @@ export async function initSession(senderId: string): Promise<void> {
     reconnectTimers.delete(senderId)
   }
 
-  // Close old socket to prevent stale event callbacks from firing
-  if (existing?.sock) {
-    try { existing.sock.end(undefined) } catch {}
+  // Null out sock reference BEFORE calling end() so that the close event fired
+  // by end() is correctly identified as stale by the guard below.
+  // Without this, the close event fires during await createWAConnection() while
+  // sessions still holds the old sock — causing onDisconnect to run and schedule
+  // a spurious timer that later kills the newly-created socket (cascade disconnect).
+  const sockToClose = existing?.sock ?? null
+  if (existing && sockToClose) {
+    sessions.set(senderId, { ...existing, sock: null as any })
+  }
+  if (sockToClose) {
+    try { sockToClose.end(undefined) } catch {}
   }
 
   const reconnectAttempts = existing?.reconnectAttempts ?? 0
@@ -95,6 +103,13 @@ export async function initSession(senderId: string): Promise<void> {
     async () => {
       // Stale callback guard
       if (sessions.get(senderId)?.sock !== sock) return
+
+      // Cancel any pending reconnect timer — socket is now connected, no need to reconnect
+      const pendingReconnect = reconnectTimers.get(senderId)
+      if (pendingReconnect) {
+        clearTimeout(pendingReconnect)
+        reconnectTimers.delete(senderId)
+      }
 
       const session = sessions.get(senderId)
       if (session) {
