@@ -48,7 +48,6 @@ interface Session {
   ready: boolean
   reconnecting: boolean
   reconnectAttempts: number
-  lastQr?: string  // simpan QR terakhir agar tidak hilang saat disconnect
 }
 
 const sessions = new Map<string, Session>()
@@ -114,8 +113,6 @@ export async function initSession(senderId: string): Promise<void> {
       if (sessions.get(senderId)?.sock !== sock) return
 
       console.log(`[session-manager] QR untuk ${senderId}: (base64 image)`)
-      const session = sessions.get(senderId)
-      if (session) session.lastQr = qrDataUrl
 
       await supabase
         .from('sender_phones')
@@ -138,7 +135,6 @@ export async function initSession(senderId: string): Promise<void> {
         session.ready = true
         session.reconnecting = false
         session.reconnectAttempts = 0
-        session.lastQr = undefined
       }
       const { error: readyErr } = await supabase
         .from('sender_phones')
@@ -156,7 +152,6 @@ export async function initSession(senderId: string): Promise<void> {
 
       const session = sessions.get(senderId)
       const attempts = (session?.reconnectAttempts ?? 0) + 1
-      const lastQr = session?.lastQr ?? null
 
       if (!shouldReconnect) {
         // Reason 401: WhatsApp aktif logout session ini
@@ -178,28 +173,24 @@ export async function initSession(senderId: string): Promise<void> {
         session.reconnecting = true
         session.reconnectAttempts = attempts
       } else {
-        sessions.set(senderId, { sock, senderId, ready: false, reconnecting: true, reconnectAttempts: attempts, lastQr: lastQr ?? undefined })
+        sessions.set(senderId, { sock, senderId, ready: false, reconnecting: true, reconnectAttempts: attempts })
       }
 
-      // Kalau creds.json masih ada, reconnect otomatis tanpa scan ulang — jangan ubah DB
-      // supaya UI tidak flicker ke "Scan QR" sementara.
-      // Jika tidak ada creds, bersihkan QR lama dari DB (set null) agar UI tampilkan spinner,
-      // bukan QR expired yang jika di-scan user akan dapat "couldn't connect" dari WA.
-      if (!hasAuthFile(senderId)) {
-        if (session) session.lastQr = undefined
-        await supabase
-          .from('sender_phones')
-          .update({ session_data: { connected: false, qr: null } })
-          .eq('id', senderId)
-      }
+      // Selalu hapus QR dari DB saat disconnect — QR hanya valid selama socket yang
+      // meng-generate-nya masih hidup. Baileys bisa menulis creds.json sebelum connection
+      // 'open' terjadi (saat QR di-scan), sehingga hasAuthFile() bisa true tapi QR di DB
+      // sudah mati. Menampilkan QR mati menyebabkan WA "Couldn't link device".
+      await supabase
+        .from('sender_phones')
+        .update({ session_data: { connected: false, qr: null } })
+        .eq('id', senderId)
 
       scheduleReconnect(senderId, attempts)
     }
   )
 
   const currentAttempts = sessions.get(senderId)?.reconnectAttempts ?? 0
-  const currentLastQr = sessions.get(senderId)?.lastQr
-  sessions.set(senderId, { sock, senderId, ready: false, reconnecting: false, reconnectAttempts: currentAttempts, lastQr: currentLastQr })
+  sessions.set(senderId, { sock, senderId, ready: false, reconnecting: false, reconnectAttempts: currentAttempts })
 }
 
 export function getReadySocket(senderId: string): WASocket | null {
