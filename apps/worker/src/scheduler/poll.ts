@@ -41,10 +41,14 @@ export async function pollOnce(): Promise<void> {
 
   await sendHeartbeat(runningCampaigns.size, queued).catch(() => {})
 
+  console.log(`[scheduler] Setelah filter waktu: ${campaigns.length} siap, ${(allScheduled?.length ?? 0) - campaigns.length} belum waktunya`)
+
   if (!campaigns.length) return
 
   for (const campaign of campaigns) {
-    if (runningCampaigns.has(campaign.id)) continue
+    const inRunning = runningCampaigns.has(campaign.id)
+    console.log(`[scheduler] Campaign ${campaign.id} (${campaign.name}): inRunning=${inRunning}`)
+    if (inRunning) continue
 
     console.log(`[scheduler] Memulai campaign: ${campaign.name} (${campaign.id})`)
     runningCampaigns.add(campaign.id)
