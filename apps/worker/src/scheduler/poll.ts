@@ -24,31 +24,19 @@ export async function pollOnce(): Promise<void> {
     return
   }
 
-  console.log(`[scheduler] Ditemukan ${allScheduled?.length ?? 0} campaign scheduled, running: ${runningCampaigns.size}`)
-
   const now = Date.now()
-  const campaigns = (allScheduled ?? []).filter(c => {
-    if (!c.scheduled_at) return true
-    const scheduledMs = new Date(c.scheduled_at).getTime()
-    if (scheduledMs > now) {
-      console.log(`[scheduler] Campaign "${c.name}" belum waktunya (scheduled: ${c.scheduled_at}, now: ${new Date(now).toISOString()})`)
-      return false
-    }
-    return true
-  })
+  const campaigns = (allScheduled ?? []).filter(
+    c => !c.scheduled_at || new Date(c.scheduled_at).getTime() <= now
+  )
 
   const queued = campaigns.filter(c => !runningCampaigns.has(c.id)).length
 
   await sendHeartbeat(runningCampaigns.size, queued).catch(() => {})
 
-  console.log(`[scheduler] Setelah filter waktu: ${campaigns.length} siap, ${(allScheduled?.length ?? 0) - campaigns.length} belum waktunya`)
-
   if (!campaigns.length) return
 
   for (const campaign of campaigns) {
-    const inRunning = runningCampaigns.has(campaign.id)
-    console.log(`[scheduler] Campaign ${campaign.id} (${campaign.name}): inRunning=${inRunning}`)
-    if (inRunning) continue
+    if (runningCampaigns.has(campaign.id)) continue
 
     console.log(`[scheduler] Memulai campaign: ${campaign.name} (${campaign.id})`)
     runningCampaigns.add(campaign.id)
