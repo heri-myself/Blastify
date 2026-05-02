@@ -146,11 +146,14 @@ export async function initSession(senderId: string): Promise<void> {
       }
 
       // Kalau creds.json masih ada, reconnect otomatis tanpa scan ulang — jangan ubah DB
-      // supaya UI tidak flicker ke "Scan QR" sementara
+      // supaya UI tidak flicker ke "Scan QR" sementara.
+      // Jika tidak ada creds, bersihkan QR lama dari DB (set null) agar UI tampilkan spinner,
+      // bukan QR expired yang jika di-scan user akan dapat "couldn't connect" dari WA.
       if (!hasAuthFile(senderId)) {
+        if (session) session.lastQr = undefined
         await supabase
           .from('sender_phones')
-          .update({ session_data: { connected: false, qr: lastQr } })
+          .update({ session_data: { connected: false, qr: null } })
           .eq('id', senderId)
       }
 
