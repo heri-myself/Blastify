@@ -70,7 +70,9 @@ export async function pickBestSender(
   if (!senders?.length) return null
 
   const { checkSendAllowed } = await import('./warmup')
+  const { isSessionReady } = await import('../baileys/session-manager')
   for (const sender of senders) {
+    if (!isSessionReady(sender.id)) continue
     const reason = await checkSendAllowed(sender as SenderPhone)
     if (!reason) return sender as SenderPhone
   }
