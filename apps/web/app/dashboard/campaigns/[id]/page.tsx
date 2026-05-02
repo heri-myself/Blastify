@@ -49,7 +49,7 @@ export default async function CampaignDetailPage({
   const allTags = Array.from(new Set((allContacts ?? []).flatMap(c => c.tags ?? []))).sort()
 
   const statusStyle: Record<string, string> = {
-    draft: 'bg-[#f2f2f0] text-[#7a7a7a]', scheduled: 'bg-blue-50 text-blue-600',
+    draft: 'bg-secondary text-muted-foreground', scheduled: 'bg-blue-50 text-blue-600',
     running: 'bg-amber-50 text-amber-600', paused: 'bg-orange-50 text-orange-500',
     done: 'bg-[#f0fdf4] text-[#25D366]', failed: 'bg-red-50 text-red-500',
   }
@@ -62,13 +62,13 @@ export default async function CampaignDetailPage({
     <div className="max-w-4xl">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-xl font-semibold text-[#111111]">{campaign.name}</h1>
+          <h1 className="text-xl font-semibold text-foreground">{campaign.name}</h1>
           <div className="flex items-center gap-2 mt-1">
             <span className={`text-[12px] px-2.5 py-1 rounded-full font-medium ${statusStyle[campaign.status]}`}>
               {statusLabel[campaign.status]}
             </span>
             {campaign.scheduled_at && (
-              <span className="text-[13px] text-[#7a7a7a] font-mono">
+              <span className="text-[13px] text-muted-foreground font-mono">
                 {new Date(campaign.scheduled_at).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })}
               </span>
             )}
@@ -84,7 +84,7 @@ export default async function CampaignDetailPage({
         </div>
       </div>
 
-      <div className="flex rounded-xl border border-[#e8e8e6] bg-white overflow-hidden shadow-sm mb-6">
+      <div className="flex rounded-xl border border-border bg-card overflow-hidden shadow-sm mb-6">
         {[
           { label: 'Total Kontak', value: counts.total },
           { label: 'Pending', value: counts.pending },
@@ -93,15 +93,15 @@ export default async function CampaignDetailPage({
           { label: 'Dilewati', value: counts.skipped },
           { label: 'Success Rate', value: `${successRate}%` },
         ].map((stat, i, arr) => (
-          <div key={stat.label} className={`flex flex-col justify-center px-5 py-3 flex-1 ${i < arr.length - 1 ? 'border-r border-[#e8e8e6]' : ''}`}>
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-[#b0b0b0] mb-1">{stat.label}</p>
-            <p className="text-lg font-bold tabular-nums text-[#111111] leading-none">{stat.value}</p>
+          <div key={stat.label} className={`flex flex-col justify-center px-5 py-3 flex-1 ${i < arr.length - 1 ? 'border-r border-border' : ''}`}>
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">{stat.label}</p>
+            <p className="text-lg font-bold tabular-nums text-foreground leading-none">{stat.value}</p>
           </div>
         ))}
       </div>
 
       {campaign.campaign_messages?.[0] && (
-        <div className="bg-white rounded-xl border border-[#e8e8e6] p-5 mb-6">
+        <div className="bg-card rounded-xl border border-border p-5 mb-6">
           <EditMessageForm
             messageId={campaign.campaign_messages[0].id}
             campaignId={id}
@@ -111,11 +111,11 @@ export default async function CampaignDetailPage({
       )}
 
       {/* Kontak Terdaftar */}
-      <div className="bg-white rounded-xl border border-[#e8e8e6] p-5 mb-4">
-        <h2 className="text-[14px] font-semibold text-[#111111] mb-4">
+      <div className="bg-card rounded-xl border border-border p-5 mb-4">
+        <h2 className="text-[14px] font-semibold text-foreground mb-4">
           Kontak Terdaftar
           {counts.total > 0 && (
-            <span className="ml-2 text-[12px] font-normal text-[#7a7a7a]">({counts.total})</span>
+            <span className="ml-2 text-[12px] font-normal text-muted-foreground">({counts.total})</span>
           )}
         </h2>
         <CampaignContactList
@@ -125,8 +125,8 @@ export default async function CampaignDetailPage({
       </div>
 
       {/* Tambah Kontak */}
-      <div className="bg-white rounded-xl border border-[#e8e8e6] p-5">
-        <h2 className="text-[14px] font-semibold text-[#111111] mb-4">Tambah Kontak</h2>
+      <div className="bg-card rounded-xl border border-border p-5">
+        <h2 className="text-[14px] font-semibold text-foreground mb-4">Tambah Kontak</h2>
         <ContactSelector
           campaignId={id}
           contacts={allContacts ?? []}

@@ -16,23 +16,23 @@ export default async function AdminUsersPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Kelola User</h1>
+        <h1 className="text-2xl font-bold text-foreground">Kelola User</h1>
         <p className="text-sm text-gray-500 mt-1">Buat dan kelola akun pengguna</p>
       </div>
 
-      <div className="bg-white border rounded-lg p-6 space-y-4">
+      <div className="bg-card border rounded-lg p-6 space-y-4">
         <h2 className="font-semibold text-gray-800">Buat User Baru</h2>
         <CreateUserForm />
       </div>
 
-      <div className="bg-white border rounded-lg overflow-hidden">
+      <div className="bg-card border rounded-lg overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-gray-50 border-b">
             <tr>
-              <th className="text-left px-4 py-3 font-medium text-gray-600">Email</th>
-              <th className="text-left px-4 py-3 font-medium text-gray-600">Role</th>
-              <th className="text-left px-4 py-3 font-medium text-gray-600">Status</th>
-              <th className="text-left px-4 py-3 font-medium text-gray-600">Dibuat</th>
+              <th className="text-left px-4 py-3 font-medium text-muted-foreground">Email</th>
+              <th className="text-left px-4 py-3 font-medium text-muted-foreground">Role</th>
+              <th className="text-left px-4 py-3 font-medium text-muted-foreground">Status</th>
+              <th className="text-left px-4 py-3 font-medium text-muted-foreground">Dibuat</th>
               <th className="px-4 py-3" />
             </tr>
           </thead>
@@ -43,7 +43,7 @@ export default async function AdminUsersPage() {
               const role = profile?.role ?? 'user'
               return (
                 <tr key={user.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 text-gray-900">{user.email}</td>
+                  <td className="px-4 py-3 text-foreground">{user.email}</td>
                   <td className="px-4 py-3">
                     <Badge variant={role === 'superadmin' ? 'default' : 'outline'}>
                       {role === 'superadmin' ? 'Superadmin' : 'User'}

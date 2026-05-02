@@ -18,7 +18,7 @@ function renderPreview(text: string): string {
     .replace(/\*([^*\n]+)\*/g, '<strong>$1</strong>')
     .replace(/_([^_\n]+)_/g, '<em>$1</em>')
     .replace(/~([^~\n]+)~/g, '<s>$1</s>')
-    .replace(/```([\s\S]+?)```/g, '<code class="font-mono bg-[#f2f2f0] px-1 rounded text-[12px]">$1</code>')
+    .replace(/```([\s\S]+?)```/g, '<code class="font-mono bg-secondary px-1 rounded text-[12px]">$1</code>')
     .replace(/\n/g, '<br>')
   return out
 }
@@ -52,20 +52,20 @@ export function WhatsAppEditor({ name, defaultValue = '', required, placeholder,
   return (
     <div className="space-y-1.5">
       {/* Toolbar */}
-      <div className="flex items-center gap-0.5 px-2 py-1.5 bg-[#f8f8f7] rounded-t-lg border border-[#e8e8e6] border-b-0">
+      <div className="flex items-center gap-0.5 px-2 py-1.5 bg-background rounded-t-lg border border-border border-b-0">
         {toolbarButtons.map(btn => (
           <button
             key={btn.label}
             type="button"
             title={btn.title}
             onClick={() => wrap(btn.before)}
-            className={`w-7 h-7 rounded flex items-center justify-center text-[13px] text-[#444] hover:bg-[#e8e8e6] transition-colors ${btn.style}`}
+            className={`w-7 h-7 rounded flex items-center justify-center text-[13px] text-foreground hover:bg-secondary transition-colors ${btn.style}`}
           >
             {btn.label}
           </button>
         ))}
-        <div className="w-px h-4 bg-[#e8e8e6] mx-1" />
-        <span className="text-[11px] text-[#a0a0a0]">Spintax: {'{opsi1|opsi2}'}</span>
+        <div className="w-px h-4 bg-border mx-1" />
+        <span className="text-[11px] text-muted-foreground">Spintax: {'{opsi1|opsi2}'}</span>
       </div>
 
       {/* Textarea */}
@@ -77,14 +77,14 @@ export function WhatsAppEditor({ name, defaultValue = '', required, placeholder,
         required={required}
         placeholder={placeholder}
         rows={rows}
-        className="w-full rounded-b-lg rounded-t-none border border-[#e8e8e6] px-3 py-2 text-[13px] text-[#111111] placeholder-[#a0a0a0] focus:outline-none focus:ring-1 focus:ring-[#111111] resize-y font-mono"
+        className="w-full rounded-b-lg rounded-t-none border border-border px-3 py-2 text-[13px] text-foreground placeholder-muted-foreground focus:outline-none focus:ring-1 focus:ring-accent resize-y font-mono"
       />
 
       {/* Preview */}
       {value.trim() && (
         <div className="mt-2">
-          <p className="text-[11px] font-medium text-[#a0a0a0] uppercase tracking-wider mb-1.5">Preview Pesan WA</p>
-          <div className="bg-[#dcf8c6] rounded-xl rounded-tr-none px-4 py-3 text-[13px] text-[#111111] leading-relaxed max-w-sm shadow-sm">
+          <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mb-1.5">Preview Pesan WA</p>
+          <div className="bg-accent/20 dark:bg-accent/15 rounded-xl rounded-tr-none px-4 py-3 text-[13px] text-foreground leading-relaxed max-w-sm shadow-sm">
             <div dangerouslySetInnerHTML={{ __html: renderPreview(value) }} />
           </div>
         </div>

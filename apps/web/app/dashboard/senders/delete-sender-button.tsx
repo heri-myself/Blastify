@@ -24,7 +24,7 @@ export function DeleteSenderButton({ senderId, phoneNumber }: { senderId: string
     <>
       <button
         onClick={() => setOpen(true)}
-        className="text-[#a0a0a0] hover:text-red-500 transition-colors p-1 rounded-md hover:bg-red-50"
+        className="text-muted-foreground hover:text-red-500 transition-colors p-1 rounded-md hover:bg-red-50"
       >
         <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <polyline points="3 6 5 6 21 6"/>
@@ -43,7 +43,7 @@ export function DeleteSenderButton({ senderId, phoneNumber }: { senderId: string
           />
 
           {/* Dialog */}
-          <div className="relative bg-white rounded-2xl shadow-xl border border-[#e8e8e6] w-full max-w-sm mx-4 overflow-hidden">
+          <div className="relative bg-card rounded-2xl shadow-xl border border-border w-full max-w-sm mx-4 overflow-hidden">
             {/* Top accent */}
             <div className="h-1 bg-red-500 w-full" />
 
@@ -58,11 +58,11 @@ export function DeleteSenderButton({ senderId, phoneNumber }: { senderId: string
                 </svg>
               </div>
 
-              <h3 className="text-[15px] font-semibold text-[#111111] mb-1">Hapus Sender?</h3>
-              <p className="text-[13px] text-[#7a7a7a] mb-1">
-                Nomor <span className="font-mono font-medium text-[#111111]">{phoneNumber}</span> akan dihapus permanen.
+              <h3 className="text-[15px] font-semibold text-foreground mb-1">Hapus Sender?</h3>
+              <p className="text-[13px] text-muted-foreground mb-1">
+                Nomor <span className="font-mono font-medium text-foreground">{phoneNumber}</span> akan dihapus permanen.
               </p>
-              <p className="text-[12px] text-[#a0a0a0]">Sesi WhatsApp dan riwayat pengiriman akan ikut terhapus.</p>
+              <p className="text-[12px] text-muted-foreground">Sesi WhatsApp dan riwayat pengiriman akan ikut terhapus.</p>
               {error && <p className="text-[12px] text-red-500 mt-2">{error}</p>}
             </div>
 
@@ -70,7 +70,7 @@ export function DeleteSenderButton({ senderId, phoneNumber }: { senderId: string
               <button
                 onClick={() => setOpen(false)}
                 disabled={isPending}
-                className="flex-1 h-9 rounded-lg border border-[#e8e8e6] text-[13px] font-medium text-[#111111] hover:bg-[#f8f8f7] transition-colors disabled:opacity-50"
+                className="flex-1 h-9 rounded-lg border border-border text-[13px] font-medium text-foreground hover:bg-background transition-colors disabled:opacity-50"
               >
                 Batal
               </button>

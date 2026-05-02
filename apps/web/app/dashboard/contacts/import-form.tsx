@@ -82,7 +82,7 @@ export function ImportForm() {
       />
       <label
         htmlFor="csv-upload"
-        className={`inline-flex items-center justify-center h-9 px-4 rounded-lg border border-[#e8e8e6] bg-white text-[13px] font-medium transition-colors cursor-pointer hover:bg-[#f8f8f7] ${loading ? 'opacity-50 pointer-events-none' : ''}`}
+        className={`inline-flex items-center justify-center h-9 px-4 rounded-lg border border-border bg-card text-[13px] font-medium transition-colors cursor-pointer hover:bg-background ${loading ? 'opacity-50 pointer-events-none' : ''}`}
       >
         {loading ? 'Mengimpor...' : 'Import CSV'}
       </label>

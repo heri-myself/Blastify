@@ -25,7 +25,7 @@ export function ContactFilters({ users, isSuperadmin, allTags }: ContactFiltersP
   return (
     <div className="flex items-center gap-2 flex-wrap mb-4">
       <div className="relative">
-        <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#a0a0a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
         <input
@@ -33,14 +33,14 @@ export function ContactFilters({ users, isSuperadmin, allTags }: ContactFiltersP
           placeholder="Cari nama / nomor..."
           defaultValue={searchParams.get('q') ?? ''}
           onChange={e => setParam('q', e.target.value)}
-          className="h-9 pl-8 pr-3 rounded-lg border border-[#e8e8e6] bg-white text-[13px] text-[#111111] placeholder-[#a0a0a0] focus:outline-none focus:ring-1 focus:ring-[#111111] w-52"
+          className="h-9 pl-8 pr-3 rounded-lg border border-border bg-card text-[13px] text-foreground placeholder-muted-foreground focus:outline-none focus:ring-1 focus:ring-accent w-52"
         />
       </div>
 
       <select
         defaultValue={searchParams.get('status') ?? ''}
         onChange={e => setParam('status', e.target.value)}
-        className="h-9 px-3 rounded-lg border border-[#e8e8e6] bg-white text-[13px] text-[#111111] focus:outline-none focus:ring-1 focus:ring-[#111111]"
+        className="h-9 px-3 rounded-lg border border-border bg-card text-[13px] text-foreground focus:outline-none focus:ring-1 focus:ring-accent"
       >
         <option value="">Semua Status</option>
         <option value="aktif">Aktif</option>
@@ -52,7 +52,7 @@ export function ContactFilters({ users, isSuperadmin, allTags }: ContactFiltersP
         <select
           defaultValue={searchParams.get('tag') ?? ''}
           onChange={e => setParam('tag', e.target.value)}
-          className="h-9 px-3 rounded-lg border border-[#e8e8e6] bg-white text-[13px] text-[#111111] focus:outline-none focus:ring-1 focus:ring-[#111111] max-w-[180px]"
+          className="h-9 px-3 rounded-lg border border-border bg-card text-[13px] text-foreground focus:outline-none focus:ring-1 focus:ring-accent max-w-[180px]"
         >
           <option value="">Semua Tags</option>
           {allTags.map(t => (
@@ -65,7 +65,7 @@ export function ContactFilters({ users, isSuperadmin, allTags }: ContactFiltersP
         <select
           defaultValue={searchParams.get('user') ?? ''}
           onChange={e => setParam('user', e.target.value)}
-          className="h-9 px-3 rounded-lg border border-[#e8e8e6] bg-white text-[13px] text-[#111111] focus:outline-none focus:ring-1 focus:ring-[#111111] max-w-[200px]"
+          className="h-9 px-3 rounded-lg border border-border bg-card text-[13px] text-foreground focus:outline-none focus:ring-1 focus:ring-accent max-w-[200px]"
         >
           <option value="">Semua User</option>
           {users.map(u => (
@@ -77,7 +77,7 @@ export function ContactFilters({ users, isSuperadmin, allTags }: ContactFiltersP
       {(searchParams.get('q') || searchParams.get('status') || searchParams.get('user') || searchParams.get('tag')) && (
         <button
           onClick={() => router.push(pathname)}
-          className="h-9 px-3 rounded-lg border border-[#e8e8e6] bg-white text-[13px] text-[#7a7a7a] hover:text-[#111111] transition-colors"
+          className="h-9 px-3 rounded-lg border border-border bg-card text-[13px] text-muted-foreground hover:text-foreground transition-colors"
         >
           Reset
         </button>

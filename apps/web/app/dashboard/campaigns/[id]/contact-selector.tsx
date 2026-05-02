@@ -95,7 +95,7 @@ export function ContactSelector({ campaignId, contacts, existingContactIds, allT
     <div>
       <div className="flex items-center gap-2 flex-wrap mb-3">
         <div className="relative">
-          <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#a0a0a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <input
@@ -103,7 +103,7 @@ export function ContactSelector({ campaignId, contacts, existingContactIds, allT
             placeholder="Cari nama / nomor..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="h-9 pl-8 pr-3 rounded-lg border border-[#e8e8e6] bg-white text-[13px] text-[#111111] placeholder-[#a0a0a0] focus:outline-none focus:ring-1 focus:ring-[#111111] w-48"
+            className="h-9 pl-8 pr-3 rounded-lg border border-border bg-card text-[13px] text-foreground placeholder-muted-foreground focus:outline-none focus:ring-1 focus:ring-accent w-48"
           />
         </div>
 
@@ -111,7 +111,7 @@ export function ContactSelector({ campaignId, contacts, existingContactIds, allT
           <select
             value={filterTag}
             onChange={e => setFilterTag(e.target.value)}
-            className="h-9 px-3 rounded-lg border border-[#e8e8e6] bg-white text-[13px] text-[#111111] focus:outline-none focus:ring-1 focus:ring-[#111111]"
+            className="h-9 px-3 rounded-lg border border-border bg-card text-[13px] text-foreground focus:outline-none focus:ring-1 focus:ring-accent"
           >
             <option value="">Semua Tags</option>
             {allTags.map(t => <option key={t} value={t}>{t}</option>)}
@@ -121,7 +121,7 @@ export function ContactSelector({ campaignId, contacts, existingContactIds, allT
         <select
           value={filterStatus}
           onChange={e => setFilterStatus(e.target.value)}
-          className="h-9 px-3 rounded-lg border border-[#e8e8e6] bg-white text-[13px] text-[#111111] focus:outline-none focus:ring-1 focus:ring-[#111111]"
+          className="h-9 px-3 rounded-lg border border-border bg-card text-[13px] text-foreground focus:outline-none focus:ring-1 focus:ring-accent"
         >
           <option value="">Semua Status</option>
           <option value="aktif">Aktif</option>
@@ -136,7 +136,7 @@ export function ContactSelector({ campaignId, contacts, existingContactIds, allT
           <button
             onClick={handleAdd}
             disabled={selected.size === 0 || loading}
-            className="h-9 px-4 rounded-lg bg-[#111111] text-white text-[13px] font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#333] transition-colors"
+            className="h-9 px-4 rounded-lg bg-foreground text-white text-[13px] font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90 transition-colors"
           >
             {loading ? 'Menambahkan...' : `Tambahkan ${selected.size > 0 ? selected.size : ''} Kontak`}
           </button>
@@ -144,14 +144,14 @@ export function ContactSelector({ campaignId, contacts, existingContactIds, allT
       </div>
 
       {filtered.length === 0 ? (
-        <p className="text-[13px] text-[#a0a0a0] py-4">
+        <p className="text-[13px] text-muted-foreground py-4">
           {contacts.length === 0 ? 'Belum ada kontak.' : 'Tidak ada kontak yang cocok dengan filter.'}
         </p>
       ) : (
-        <div className="overflow-hidden rounded-xl border border-[#e8e8e6]">
+        <div className="overflow-hidden rounded-xl border border-border">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-[#e8e8e6]">
+              <tr className="border-b border-border">
                 <th className="px-4 py-3 w-8">
                   <input
                     type="checkbox"
@@ -160,16 +160,16 @@ export function ContactSelector({ campaignId, contacts, existingContactIds, allT
                     className="rounded"
                   />
                 </th>
-                <th className="text-left px-4 py-3 text-[12px] font-medium text-[#7a7a7a] uppercase tracking-wider">Nama</th>
-                <th className="text-left px-4 py-3 text-[12px] font-medium text-[#7a7a7a] uppercase tracking-wider">Nomor</th>
-                <th className="text-left px-4 py-3 text-[12px] font-medium text-[#7a7a7a] uppercase tracking-wider">Tags</th>
+                <th className="text-left px-4 py-3 text-[12px] font-medium text-muted-foreground uppercase tracking-wider">Nama</th>
+                <th className="text-left px-4 py-3 text-[12px] font-medium text-muted-foreground uppercase tracking-wider">Nomor</th>
+                <th className="text-left px-4 py-3 text-[12px] font-medium text-muted-foreground uppercase tracking-wider">Tags</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#f2f2f0]">
+            <tbody className="divide-y divide-border">
               {filtered.map(c => (
                 <tr
                   key={c.id}
-                  className="hover:bg-[#f8f8f7] transition-colors cursor-pointer"
+                  className="hover:bg-background transition-colors cursor-pointer"
                   onClick={() => toggleOne(c.id)}
                 >
                   <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
@@ -180,8 +180,8 @@ export function ContactSelector({ campaignId, contacts, existingContactIds, allT
                       className="rounded"
                     />
                   </td>
-                  <td className="px-4 py-3 text-[13px] text-[#111111]">{c.name ?? '—'}</td>
-                  <td className="px-4 py-3 font-mono text-[13px] text-[#111111]">{c.phone}</td>
+                  <td className="px-4 py-3 text-[13px] text-foreground">{c.name ?? '—'}</td>
+                  <td className="px-4 py-3 font-mono text-[13px] text-foreground">{c.phone}</td>
                   <td className="px-4 py-3">
                     <div className="flex gap-1 flex-wrap">
                       {c.tags?.map(tag => (
@@ -193,7 +193,7 @@ export function ContactSelector({ campaignId, contacts, existingContactIds, allT
               ))}
             </tbody>
           </table>
-          <div className="px-4 py-2 border-t border-[#f2f2f0] text-[12px] text-[#a0a0a0]">
+          <div className="px-4 py-2 border-t border-border text-[12px] text-muted-foreground">
             Menampilkan {filtered.length} kontak · {selected.size} dipilih
           </div>
         </div>

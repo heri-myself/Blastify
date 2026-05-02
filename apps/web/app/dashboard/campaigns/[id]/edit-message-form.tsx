@@ -38,7 +38,7 @@ export function EditMessageForm({ messageId, campaignId, initialContent }: Props
           <h2 className="font-medium">Isi Pesan</h2>
           <Button variant="outline" size="sm" onClick={() => setEditing(true)}>Edit</Button>
         </div>
-        <p className="text-sm text-gray-600 whitespace-pre-wrap">{initialContent}</p>
+        <p className="text-sm text-muted-foreground whitespace-pre-wrap">{initialContent}</p>
       </div>
     )
   }

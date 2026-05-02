@@ -6,7 +6,7 @@ const senderStatusStyle: Record<string, string> = {
   warmup:      'bg-amber-50 text-amber-600',
   soft_banned: 'bg-red-50 text-red-500',
   recovering:  'bg-orange-50 text-orange-500',
-  disabled:    'bg-[#f2f2f0] text-[#7a7a7a]',
+  disabled:    'bg-secondary text-muted-foreground',
 }
 
 const senderStatusLabel: Record<string, string> = {
@@ -35,9 +35,9 @@ export default async function NewCampaignPage() {
   return (
     <div className="max-w-2xl">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Buat Campaign Baru</h1>
+        <h1 className="text-2xl font-bold text-foreground">Buat Campaign Baru</h1>
       </div>
-      <form action={createCampaign as (formData: FormData) => void} className="space-y-5 bg-white rounded-lg border p-6">
+      <form action={createCampaign as (formData: FormData) => void} className="space-y-5 bg-card rounded-lg border p-6">
         <div className="space-y-2">
           <Label htmlFor="name">Nama Campaign</Label>
           <Input id="name" name="name" placeholder="Promo Ramadan 2026" required />
@@ -53,8 +53,8 @@ export default async function NewCampaignPage() {
                 <span className={`inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full font-medium ${senderStatusStyle[s.status] ?? senderStatusStyle.disabled}`}>
                   {s.status === 'active' && (
                     <span className="relative flex h-1.5 w-1.5">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
-                      <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white" />
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-card opacity-75" />
+                      <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-card" />
                     </span>
                   )}
                   {senderStatusLabel[s.status] ?? s.status}
@@ -102,7 +102,7 @@ export default async function NewCampaignPage() {
         <div className="space-y-2">
           <Label htmlFor="scheduled_at">Jadwal Kirim (opsional)</Label>
           <Input id="scheduled_at" name="scheduled_at" type="datetime-local" />
-          <p className="text-xs text-gray-400">Kosongkan untuk simpan sebagai draft</p>
+          <p className="text-xs text-muted-foreground">Kosongkan untuk simpan sebagai draft</p>
         </div>
 
         <div className="flex gap-3">

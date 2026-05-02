@@ -113,7 +113,7 @@ export function QRButton({ senderId }: { senderId: string }) {
       </Button>
 
       {open && (
-        <div className="mt-3 w-56 rounded-2xl border border-gray-100 shadow-lg overflow-hidden bg-white">
+        <div className="mt-3 w-56 rounded-2xl border border-border shadow-lg overflow-hidden bg-card">
           {/* Header */}
           <div className="bg-[#25D366] px-3 py-2 flex items-center justify-between">
             <div className="flex items-center gap-1.5">
@@ -125,7 +125,7 @@ export function QRButton({ senderId }: { senderId: string }) {
             </div>
             <div className="flex items-center gap-1.5">
               {qr && (
-                <span className={`text-xs font-bold tabular-nums px-2 py-0.5 rounded-full ${countdown <= 15 ? 'bg-red-500 text-white' : 'bg-white/20 text-white'}`}>
+                <span className={`text-xs font-bold tabular-nums px-2 py-0.5 rounded-full ${countdown <= 15 ? 'bg-red-500 text-white' : 'bg-card/20 text-white'}`}>
                   {countdown}s
                 </span>
               )}
@@ -146,12 +146,12 @@ export function QRButton({ senderId }: { senderId: string }) {
                 </div>
                 {countdown <= 10 && (
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="bg-white/95 rounded-xl px-3 py-2 text-center shadow">
+                    <div className="bg-card/95 rounded-xl px-3 py-2 text-center shadow">
                       <svg className="w-4 h-4 animate-spin text-[#25D366] mx-auto mb-1" fill="none" viewBox="0 0 24 24">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
                       </svg>
-                      <p className="text-xs font-semibold text-[#111]">Memperbarui QR...</p>
+                      <p className="text-xs font-semibold text-foreground">Memperbarui QR...</p>
                     </div>
                   </div>
                 )}
@@ -162,15 +162,15 @@ export function QRButton({ senderId }: { senderId: string }) {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
                 </svg>
-                <p className="text-[11px] text-[#a0a0a0]">Menunggu QR...</p>
-                <p className="text-[10px] text-[#c0c0c0]">refresh otomatis tiap {POLL_INTERVAL}s</p>
+                <p className="text-[11px] text-muted-foreground">Menunggu QR...</p>
+                <p className="text-[10px] text-muted-foreground">refresh otomatis tiap {POLL_INTERVAL}s</p>
               </div>
             )}
           </div>
 
           {/* Progress bar */}
           {qr && (
-            <div className="h-1 bg-gray-100">
+            <div className="h-1 bg-secondary">
               <div
                 className={`h-full transition-all duration-1000 ${countdown <= 15 ? 'bg-red-400' : 'bg-[#25D366]'}`}
                 style={{ width: `${(countdown / QR_TTL) * 100}%` }}
@@ -180,7 +180,7 @@ export function QRButton({ senderId }: { senderId: string }) {
 
           {/* Footer */}
           <div className="px-3 py-2 bg-gray-50">
-            <p className="text-[10px] text-gray-400">Buka WA → Perangkat Tertaut → Tautkan Perangkat</p>
+            <p className="text-[10px] text-muted-foreground">Buka WA → Perangkat Tertaut → Tautkan Perangkat</p>
           </div>
         </div>
       )}

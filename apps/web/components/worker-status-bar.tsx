@@ -57,11 +57,11 @@ export function WorkerStatusBar() {
   const sentToday = status?.worker.messagesSentToday ?? 0
 
   return (
-    <div className="flex rounded-xl border border-[#e8e8e6] bg-white overflow-hidden shadow-sm text-[12px] mb-6">
+    <div className="flex rounded-xl border border-border bg-card overflow-hidden shadow-sm text-[12px] mb-6">
 
       {/* Worker Engine */}
-      <div className="flex flex-col justify-center px-5 py-3 border-r border-[#e8e8e6] flex-1">
-        <p className="text-[10px] font-semibold uppercase tracking-widest text-[#b0b0b0] mb-1">Worker Engine</p>
+      <div className="flex flex-col justify-center px-5 py-3 border-r border-border flex-1">
+        <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">Worker Engine</p>
         <div className="flex items-center gap-2">
           <span className="relative flex h-2.5 w-2.5 shrink-0">
             {loading ? (
@@ -75,31 +75,31 @@ export function WorkerStatusBar() {
               <span className="h-2.5 w-2.5 rounded-full bg-red-400" />
             )}
           </span>
-          <span className={`font-semibold ${loading ? 'text-[#ccc]' : isOnline ? 'text-[#111]' : 'text-red-500'}`}>
+          <span className={`font-semibold ${loading ? 'text-muted-foreground' : isOnline ? 'text-foreground' : 'text-red-500'}`}>
             {loading ? 'Memuat...' : isOnline ? 'Online' : 'Offline'}
           </span>
           {!loading && isOnline && (status?.worker.secondsAgo ?? 0) > 0 && (
-            <span className="text-[10px] text-[#ccc]">{status!.worker.secondsAgo}s ago</span>
+            <span className="text-[10px] text-muted-foreground">{status!.worker.secondsAgo}s ago</span>
           )}
         </div>
       </div>
 
       {/* Sender WA */}
-      <div className="flex flex-col justify-center px-5 py-3 border-r border-[#e8e8e6] flex-1">
-        <p className="text-[10px] font-semibold uppercase tracking-widest text-[#b0b0b0] mb-1">Sender WA</p>
+      <div className="flex flex-col justify-center px-5 py-3 border-r border-border flex-1">
+        <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">Sender WA</p>
         <div className="flex items-baseline gap-1">
-          <span className={`text-lg font-bold tabular-nums leading-none ${connectedSenders > 0 ? 'text-[#25D366]' : 'text-[#ccc]'}`}>
+          <span className={`text-lg font-bold tabular-nums leading-none ${connectedSenders > 0 ? 'text-[#25D366]' : 'text-muted-foreground'}`}>
             {connectedSenders}
           </span>
-          <span className="text-[#ccc] font-light text-base leading-none">/</span>
-          <span className="text-[#111] font-semibold text-base leading-none">{totalSenders}</span>
-          <span className="text-[#b0b0b0] ml-1">terhubung</span>
+          <span className="text-muted-foreground font-light text-base leading-none">/</span>
+          <span className="text-foreground font-semibold text-base leading-none">{totalSenders}</span>
+          <span className="text-muted-foreground ml-1">terhubung</span>
         </div>
       </div>
 
       {/* Campaign */}
-      <div className="flex flex-col justify-center px-5 py-3 border-r border-[#e8e8e6] flex-1">
-        <p className="text-[10px] font-semibold uppercase tracking-widest text-[#b0b0b0] mb-1">Campaign</p>
+      <div className="flex flex-col justify-center px-5 py-3 border-r border-border flex-1">
+        <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">Campaign</p>
         <div className="flex items-center gap-2 flex-wrap">
           {running > 0 ? (
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 text-amber-600 font-semibold text-[11px]">
@@ -107,7 +107,7 @@ export function WorkerStatusBar() {
               {running} Berjalan
             </span>
           ) : (
-            <span className="text-[#b0b0b0] font-medium">Idle</span>
+            <span className="text-muted-foreground font-medium">Idle</span>
           )}
           {scheduled > 0 && (
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 text-blue-500 font-semibold text-[11px]">
@@ -119,10 +119,10 @@ export function WorkerStatusBar() {
 
       {/* Messages Today */}
       <div className="flex flex-col justify-center px-5 py-3 flex-1">
-        <p className="text-[10px] font-semibold uppercase tracking-widest text-[#b0b0b0] mb-1">Terkirim Hari Ini</p>
+        <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">Terkirim Hari Ini</p>
         <div className="flex items-baseline gap-1">
-          <span className="text-lg font-bold tabular-nums text-[#111] leading-none">{sentToday}</span>
-          <span className="text-[#b0b0b0]">pesan</span>
+          <span className="text-lg font-bold tabular-nums text-foreground leading-none">{sentToday}</span>
+          <span className="text-muted-foreground">pesan</span>
         </div>
       </div>
 
