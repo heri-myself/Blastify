@@ -27,9 +27,15 @@ export async function pollOnce(): Promise<void> {
   console.log(`[scheduler] Ditemukan ${allScheduled?.length ?? 0} campaign scheduled, running: ${runningCampaigns.size}`)
 
   const now = Date.now()
-  const campaigns = (allScheduled ?? []).filter(
-    c => !c.scheduled_at || new Date(c.scheduled_at).getTime() <= now
-  )
+  const campaigns = (allScheduled ?? []).filter(c => {
+    if (!c.scheduled_at) return true
+    const scheduledMs = new Date(c.scheduled_at).getTime()
+    if (scheduledMs > now) {
+      console.log(`[scheduler] Campaign "${c.name}" belum waktunya (scheduled: ${c.scheduled_at}, now: ${new Date(now).toISOString()})`)
+      return false
+    }
+    return true
+  })
 
   const queued = campaigns.filter(c => !runningCampaigns.has(c.id)).length
 
