@@ -2,8 +2,6 @@ import { createClient } from '@/lib/supabase/server'
 import { UploadForm } from './upload-form'
 import { deleteMedia } from './actions'
 import { Button } from '@/components/ui/button'
-import Image from 'next/image'
-
 export default async function MediaPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -24,7 +22,8 @@ export default async function MediaPage() {
           <div key={file.id} className="bg-white rounded-lg border overflow-hidden group">
             {file.file_type === 'image' ? (
               <div className="relative aspect-square bg-gray-100">
-                <Image src={file.public_url} alt={file.filename} fill className="object-cover" />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={file.public_url} alt={file.filename} className="w-full h-full object-cover" />
               </div>
             ) : (
               <div className="aspect-square bg-gray-100 flex items-center justify-center">
