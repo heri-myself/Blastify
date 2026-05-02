@@ -24,6 +24,8 @@ export async function pollOnce(): Promise<void> {
     return
   }
 
+  console.log(`[scheduler] Ditemukan ${allScheduled?.length ?? 0} campaign scheduled, running: ${runningCampaigns.size}`)
+
   const now = Date.now()
   const campaigns = (allScheduled ?? []).filter(
     c => !c.scheduled_at || new Date(c.scheduled_at).getTime() <= now
