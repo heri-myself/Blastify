@@ -14,18 +14,26 @@ export async function pollOnce(): Promise<void> {
     lastResetDate = today
   }
 
-  const now = new Date().toISOString()
-  const { data: campaigns } = await supabase
+  const { data: allScheduled, error: queryError } = await supabase
     .from('campaigns')
-    .select('id, name')
+    .select('id, name, scheduled_at')
     .eq('status', 'scheduled')
-    .or(`scheduled_at.is.null,scheduled_at.lte.${now}`)
 
-  const queued = campaigns?.filter(c => !runningCampaigns.has(c.id)).length ?? 0
+  if (queryError) {
+    console.error('[scheduler] Gagal query campaigns:', queryError.message)
+    return
+  }
+
+  const now = Date.now()
+  const campaigns = (allScheduled ?? []).filter(
+    c => !c.scheduled_at || new Date(c.scheduled_at).getTime() <= now
+  )
+
+  const queued = campaigns.filter(c => !runningCampaigns.has(c.id)).length
 
   await sendHeartbeat(runningCampaigns.size, queued).catch(() => {})
 
-  if (!campaigns?.length) return
+  if (!campaigns.length) return
 
   for (const campaign of campaigns) {
     if (runningCampaigns.has(campaign.id)) continue
