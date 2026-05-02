@@ -20,6 +20,28 @@ function reconnectDelay(attempts: number): number {
   return Math.min(5_000 * Math.pow(2, attempts - 1), 300_000)
 }
 
+// Schedule a reconnect with error handling so sender never gets stuck if initSession throws
+function scheduleReconnect(senderId: string, attempts: number): void {
+  const delay = reconnectDelay(attempts)
+  console.log(`[session-manager] Jadwal reconnect ${senderId} dalam ${Math.round(delay / 1000)}s (attempt ${attempts})`)
+  const timer = setTimeout(async () => {
+    reconnectTimers.delete(senderId)
+    try {
+      await initSession(senderId)
+    } catch (err) {
+      console.error(`[session-manager] initSession gagal untuk ${senderId}, retry:`, err)
+      const session = sessions.get(senderId)
+      const nextAttempts = (session?.reconnectAttempts ?? attempts) + 1
+      if (session) {
+        session.reconnecting = true
+        session.reconnectAttempts = nextAttempts
+      }
+      scheduleReconnect(senderId, nextAttempts)
+    }
+  }, delay)
+  reconnectTimers.set(senderId, timer)
+}
+
 interface Session {
   sock: WASocket
   senderId: string
@@ -146,8 +168,7 @@ export async function initSession(senderId: string): Promise<void> {
           .update({ status: 'warmup', session_data: { connected: false, qr: null } })
           .eq('id', senderId)
         // Reconnect untuk generate QR baru
-        const timer = setTimeout(() => initSession(senderId), 5_000)
-        reconnectTimers.set(senderId, timer)
+        scheduleReconnect(senderId, 1)
         return
       }
 
@@ -172,10 +193,7 @@ export async function initSession(senderId: string): Promise<void> {
           .eq('id', senderId)
       }
 
-      const delay = reconnectDelay(attempts)
-      console.log(`[session-manager] Reconnect sender ${senderId} dalam ${Math.round(delay / 1000)}s (attempt ${attempts})`)
-      const timer = setTimeout(() => initSession(senderId), delay)
-      reconnectTimers.set(senderId, timer)
+      scheduleReconnect(senderId, attempts)
     }
   )
 
@@ -207,6 +225,12 @@ export async function syncNewSenders(): Promise<void> {
     if (!session) {
       console.log(`[session-manager] Sender baru ditemukan: ${sender.id}, init sesi...`)
       await initSession(sender.id)
+    } else if (session.reconnecting && !reconnectTimers.has(sender.id)) {
+      // Session stuck: reconnecting=true tapi tidak ada timer aktif (initSession pernah throw)
+      console.log(`[session-manager] Session ${sender.id} stuck tanpa timer, reschedule reconnect`)
+      const nextAttempts = (session.reconnectAttempts ?? 0) + 1
+      session.reconnectAttempts = nextAttempts
+      scheduleReconnect(sender.id, nextAttempts)
     }
   }
 }

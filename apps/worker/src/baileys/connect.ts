@@ -43,7 +43,7 @@ export async function createWAConnection(
     },
     printQRInTerminal: false,
     generateHighQualityLinkPreview: false,
-    keepAliveIntervalMs: 15_000,
+    keepAliveIntervalMs: 25_000,
     connectTimeoutMs: 60_000,
     defaultQueryTimeoutMs: 60_000,
     retryRequestDelayMs: 500,
