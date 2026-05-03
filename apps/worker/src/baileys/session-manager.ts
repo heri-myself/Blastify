@@ -20,18 +20,8 @@ function reconnectDelay(attempts: number): number {
   return Math.min(5_000 * Math.pow(2, attempts - 1), 300_000)
 }
 
-// Jika sender tidak punya creds dan sudah terlalu banyak gagal, hentikan spam reconnect.
-// Sender perlu scan QR manual — tidak perlu terus mencoba setiap 5 menit.
-const MAX_NO_CREDS_ATTEMPTS = 5
-
 // Schedule a reconnect with error handling so sender never gets stuck if initSession throws
 function scheduleReconnect(senderId: string, attempts: number): void {
-  // Jika tidak ada creds dan sudah melebihi batas percobaan, berhenti — tunggu user scan QR
-  if (!hasAuthFile(senderId) && attempts > MAX_NO_CREDS_ATTEMPTS) {
-    console.log(`[session-manager] Sender ${senderId} tidak punya creds setelah ${attempts} percobaan, berhenti reconnect — tunggu scan QR manual`)
-    return
-  }
-
   const delay = reconnectDelay(attempts)
   console.log(`[session-manager] Jadwal reconnect ${senderId} dalam ${Math.round(delay / 1000)}s (attempt ${attempts})`)
   const timer = setTimeout(async () => {
@@ -231,14 +221,11 @@ export async function syncNewSenders(): Promise<void> {
       session.reconnectAttempts = nextAttempts
       scheduleReconnect(sender.id, nextAttempts)
     } else if (!session.ready && !session.reconnecting && !reconnectTimers.has(sender.id)) {
-      // Session ada tapi tidak ready dan tidak sedang reconnect.
-      // Hanya force reconnect jika punya creds — kalau tidak, tunggu user scan QR manual.
-      if (hasAuthFile(sender.id)) {
-        console.log(`[session-manager] Session ${sender.id} tidak ready dan tidak reconnecting, force reconnect`)
-        session.reconnecting = true
-        session.reconnectAttempts = (session.reconnectAttempts ?? 0) + 1
-        scheduleReconnect(sender.id, session.reconnectAttempts)
-      }
+      // Session ada tapi tidak ready dan tidak sedang reconnect (socket mati, close event terlewat).
+      console.log(`[session-manager] Session ${sender.id} tidak ready dan tidak reconnecting, force reconnect`)
+      session.reconnecting = true
+      session.reconnectAttempts = (session.reconnectAttempts ?? 0) + 1
+      scheduleReconnect(sender.id, session.reconnectAttempts)
     }
   }
 }
