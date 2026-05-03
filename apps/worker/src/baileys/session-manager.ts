@@ -138,7 +138,7 @@ export async function initSession(senderId: string): Promise<void> {
       }
       const { error: readyErr } = await supabase
         .from('sender_phones')
-        .update({ session_data: { qr: null, connected: true }, status: 'active' })
+        .update({ session_data: { qr: null, connected: true, reconnecting: false }, status: 'active' })
         .eq('id', senderId)
       if (readyErr) console.error(`[session-manager] Gagal update connected=true untuk ${senderId}:`, readyErr.message)
       else console.log(`[session-manager] Sender ${senderId} terhubung dan aktif`)
@@ -160,14 +160,14 @@ export async function initSession(senderId: string): Promise<void> {
         deleteAuthFiles(senderId)
         await supabase
           .from('sender_phones')
-          .update({ status: 'warmup', session_data: { connected: false, qr: null } })
+          .update({ status: 'warmup', session_data: { connected: false, qr: null, reconnecting: false } })
           .eq('id', senderId)
         // Reconnect untuk generate QR baru
         scheduleReconnect(senderId, 1)
         return
       }
 
-      // shouldReconnect = true: koneksi putus (408, network, dll)
+      // shouldReconnect = true: koneksi putus (408, network, 515 setelah scan QR, dll)
       if (session) {
         session.ready = false
         session.reconnecting = true
@@ -176,13 +176,11 @@ export async function initSession(senderId: string): Promise<void> {
         sessions.set(senderId, { sock, senderId, ready: false, reconnecting: true, reconnectAttempts: attempts })
       }
 
-      // Selalu hapus QR dari DB saat disconnect — QR hanya valid selama socket yang
-      // meng-generate-nya masih hidup. Baileys bisa menulis creds.json sebelum connection
-      // 'open' terjadi (saat QR di-scan), sehingga hasAuthFile() bisa true tapi QR di DB
-      // sudah mati. Menampilkan QR mati menyebabkan WA "Couldn't link device".
+      // Tandai reconnecting=true di DB agar UI bisa membedakan "Offline" vs "Sedang Konek Ulang".
+      // QR dihapus karena sudah tidak valid — socket yang meng-generate-nya sudah mati.
       await supabase
         .from('sender_phones')
-        .update({ session_data: { connected: false, qr: null } })
+        .update({ session_data: { connected: false, qr: null, reconnecting: true } })
         .eq('id', senderId)
 
       scheduleReconnect(senderId, attempts)
@@ -222,6 +220,13 @@ export async function syncNewSenders(): Promise<void> {
       const nextAttempts = (session.reconnectAttempts ?? 0) + 1
       session.reconnectAttempts = nextAttempts
       scheduleReconnect(sender.id, nextAttempts)
+    } else if (!session.ready && !session.reconnecting && !reconnectTimers.has(sender.id)) {
+      // Session ada tapi tidak ready dan tidak sedang reconnect — kemungkinan socket mati karena
+      // close event terlewat (stale guard). Paksakan reconnect sebagai safety net.
+      console.log(`[session-manager] Session ${sender.id} tidak ready dan tidak reconnecting, force reconnect`)
+      session.reconnecting = true
+      session.reconnectAttempts = (session.reconnectAttempts ?? 0) + 1
+      scheduleReconnect(sender.id, session.reconnectAttempts)
     }
   }
 }
