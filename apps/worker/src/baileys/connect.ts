@@ -4,13 +4,14 @@ import {
   DisconnectReason,
   fetchLatestBaileysVersion,
   makeCacheableSignalKeyStore,
+  Browsers,
 } from '@whiskeysockets/baileys'
 import { Boom } from '@hapi/boom'
 import { join } from 'path'
 import pino from 'pino'
 import QRCode from 'qrcode'
 
-const logger = pino({ level: 'warn' })
+const logger = pino({ level: 'silent' })
 
 export type WASocket = ReturnType<typeof makeWASocket>
 
@@ -37,13 +38,16 @@ export async function createWAConnection(
   const sock = makeWASocket({
     version,
     logger,
+    browser: Browsers.ubuntu('Chrome'),
     auth: {
       creds: state.creds,
       keys: makeCacheableSignalKeyStore(state.keys, logger),
     },
     printQRInTerminal: false,
     generateHighQualityLinkPreview: false,
-    keepAliveIntervalMs: 25_000,
+    syncFullHistory: false,
+    markOnlineOnConnect: false,
+    keepAliveIntervalMs: 15_000,
     connectTimeoutMs: 60_000,
     defaultQueryTimeoutMs: 60_000,
     retryRequestDelayMs: 500,
